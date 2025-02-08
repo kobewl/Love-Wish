@@ -1,0 +1,49 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: love-wish-backend
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://39.98.107.158:3306/love_wish?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: kobe200800
+  redis:
+    host: 39.98.107.158
+    port: 6379
+    database: 0
+    timeout: 10000
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.lovewish.model
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+jwt:
+  secret: lovewish123456
+  expiration: 604800
+
+wx:
+  miniapp:
+    appid: wx07415a30219200d8
+    secret: 71478ba8b71e82b4f00625795952ec48
+    config-storage:
+      type: redis
+      key-prefix: wx
+      redis:
+        host: ${spring.redis.host}
+        port: ${spring.redis.port}
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true

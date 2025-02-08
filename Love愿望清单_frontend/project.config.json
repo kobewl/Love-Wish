@@ -1,6 +1,6 @@
 {
   "compileType": "miniprogram",
-  "libVersion": "trial",
+  "libVersion": "3.3.0",
   "packOptions": {
     "ignore": [],
     "include": []
@@ -24,10 +24,7 @@
       "disablePlugins": [],
       "outputPath": ""
     },
-    "useCompilerPlugins": [
-      "typescript",
-      "less"
-    ],
+    "useCompilerPlugins": false,
     "nodeModules": true,
     "urlCheck": false
   },

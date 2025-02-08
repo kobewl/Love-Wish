@@ -1,4 +1,10 @@
 {
   "navigationBarTitleText": "纪念日",
-  "usingComponents": {}
+  "navigationBarBackgroundColor": "#FF69B4",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "van-calendar": "@vant/weapp/calendar/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-icon": "@vant/weapp/icon/index"
+  }
 } 

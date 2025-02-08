@@ -14,6 +14,7 @@
   "author": "Kobe Wang",
   "license": "MIT",
   "dependencies": {
-    "@vant/weapp": "^1.11.1"
+    "@vant/weapp": "^1.11.7",
+    "dayjs": "^1.11.13"
   }
 }

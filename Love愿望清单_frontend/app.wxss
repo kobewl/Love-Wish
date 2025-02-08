@@ -7,45 +7,102 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
-} 
+}
 
 page {
-  --primary-color: #FF69B4;
-  --primary-gradient: linear-gradient(45deg, #FF69B4, #FF1493);
-  --text-color: #333333;
-  --desc-color: #666666;
-  --border-color: #EEEEEE;
-  --tag-color: #FF69B4;
-  --bg-color: #f7f7f7;
-  
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
-    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
-    sans-serif;
+  --primary-color: #ff69b4;
+  --primary-gradient: linear-gradient(135deg, #ff69b4, #ff1493);
+  --bg-color: #f8f8f8;
+  --text-color: #333;
+  --desc-color: #999;
+  --border-color: #eeeeee;
+  --tag-color: #ff69b4;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica,
+    Segoe UI, Arial, Roboto, "PingFang SC", "miui", "Hiragino Sans GB",
+    "Microsoft Yahei", sans-serif;
   font-size: 28rpx;
   color: var(--text-color);
   background: var(--bg-color);
 }
 
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  color: transparent;
+}
+
+/* 主题色相关 */
+.text-primary {
+  color: var(--primary-color);
+}
+
+.bg-primary {
+  background: var(--primary-color);
+}
+
+.gradient-primary {
+  background: var(--primary-gradient);
+}
+
 /* 常用flex布局 */
-.flex {
+.flex-row {
   display: flex;
+  flex-direction: row;
 }
 
-.flex-col {
+.flex-column {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
 }
 
-.items-center {
+.flex-center {
+  display: flex;
   align-items: center;
-}
-
-.justify-center {
   justify-content: center;
 }
 
-.justify-between {
+.flex-between {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+}
+
+/* 常用间距 */
+.margin-top {
+  margin-top: 20rpx;
+}
+
+.margin-bottom {
+  margin-bottom: 20rpx;
+}
+
+.padding {
+  padding: 20rpx;
+}
+
+/* 文字单行省略 */
+.text-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 按钮点击效果 */
+.btn-hover {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+/* 阴影效果 */
+.shadow {
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.shadow-lg {
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
 }
 
 /* 常用外观样式 */
@@ -102,7 +159,7 @@ page {
 }
 
 .border-bottom::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   bottom: 0;
@@ -110,4 +167,4 @@ page {
   height: 1px;
   background: var(--border-color);
   transform: scaleY(0.5);
-} 
+}
