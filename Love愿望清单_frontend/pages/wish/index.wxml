@@ -1,0 +1,57 @@
+<view class="wish-container">
+  <!-- Tab 切换 -->
+  <van-tabs 
+    active="{{ activeTab }}" 
+    bind:change="onTabChange"
+    color="var(--primary-color)"
+    title-active-color="var(--primary-color)"
+    swipeable
+  >
+    <van-tab 
+      wx:for="{{tabs}}" 
+      wx:key="type"
+      title="{{item.title}}"
+    >
+      <!-- 愿望列表 -->
+      <view class="wish-list">
+        <view wx:if="{{!wishList.length}}" class="empty-box">
+          <image class="empty-img" src="/assets/images/empty-wish.png" mode="aspectFit"/>
+          <text class="empty-text">暂无愿望清单~</text>
+        </view>
+        <view 
+          wx:for="{{wishList}}" 
+          wx:key="id"
+          class="wish-item card"
+        >
+          <view class="wish-header flex justify-between items-center">
+            <view class="flex items-center">
+              <view class="type-tag {{item.type}}">{{item.typeText}}</view>
+              <text class="status">{{item.statusText}}</text>
+            </view>
+            <text class="date">{{item.createTime}}</text>
+          </view>
+          <view class="wish-content">
+            <text class="title">{{item.title}}</text>
+            <text class="desc">{{item.content}}</text>
+          </view>
+          <view class="wish-footer flex justify-between items-center">
+            <view class="progress-box">
+              <text class="progress-text">完成进度 {{item.progress}}%</text>
+              <view class="progress-bar">
+                <view class="progress" style="width:{{item.progress}}%"></view>
+              </view>
+            </view>
+            <view class="action-box">
+              <button class="btn btn-sm" bindtap="viewDetail" data-id="{{item.id}}">查看</button>
+            </view>
+          </view>
+        </view>
+      </view>
+    </van-tab>
+  </van-tabs>
+
+  <!-- 悬浮按钮 -->
+  <view class="fab-btn" bindtap="createWish">
+    <van-icon name="plus" size="24px" color="#fff"/>
+  </view>
+</view> 

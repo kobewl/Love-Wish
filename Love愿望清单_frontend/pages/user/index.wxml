@@ -1,0 +1,107 @@
+<!-- 用户中心 -->
+<view class="user-container">
+  <!-- 顶部背景 -->
+  <view class="bg-top" style="background: linear-gradient(to bottom, #FF69B4, #FFB6C1);">
+  </view>
+
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-info">
+      <image class="avatar" src="{{userInfo.avatarUrl || '/images/tabbar/user.png'}}" mode="aspectFill"></image>
+      <view class="info-right">
+        <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
+        <view class="pair-status" wx:if="{{userInfo.pairStatus === 1}}">
+          <van-icon name="like" color="#FF69B4" size="32rpx" />
+          <text>已配对</text>
+        </view>
+        <view class="pair-code" wx:else bindtap="copyPairCode">
+          <text>配对码: {{userInfo.pairCode || '******'}}</text>
+          <van-icon name="copy" color="#FF69B4" size="32rpx" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="function-list">
+    <!-- 我的纪念日 -->
+    <view class="function-item" bindtap="navigateToAnniversary">
+      <view class="item-left">
+        <van-icon name="calendar-o" color="#FF69B4" size="40rpx" />
+        <text>我的纪念日</text>
+      </view>
+      <van-icon name="arrow" />
+    </view>
+    
+    <!-- 我的愿望单 -->
+    <view class="function-item" bindtap="navigateToWishList">
+      <view class="item-left">
+        <van-icon name="star-o" color="#FF69B4" size="40rpx" />
+        <text>我的愿望单</text>
+      </view>
+      <van-icon name="arrow" />
+    </view>
+
+    <!-- 情侣空间 -->
+    <view class="function-item" bindtap="navigateToCouple">
+      <view class="item-left">
+        <van-icon name="friends-o" color="#FF69B4" size="40rpx" />
+        <text>情侣空间</text>
+      </view>
+      <van-icon name="arrow" />
+    </view>
+  </view>
+
+  <!-- 设置列表 -->
+  <view class="setting-list">
+    <!-- 消息提醒 -->
+    <view class="setting-item">
+      <view class="item-left">
+        <van-icon name="bell" color="#FF69B4" size="40rpx" />
+        <text>消息提醒</text>
+      </view>
+      <switch checked="{{notificationEnabled}}" bindchange="toggleNotification" color="#FF69B4"></switch>
+    </view>
+
+    <!-- 主题设置 -->
+    <view class="setting-item" bindtap="showThemeSelector">
+      <view class="item-left">
+        <van-icon name="setting-o" color="#FF69B4" size="40rpx" />
+        <text>主题设置</text>
+      </view>
+      <view class="theme-preview" style="background: {{currentTheme.color}}"></view>
+    </view>
+
+    <!-- 关于我们 -->
+    <view class="setting-item" bindtap="navigateToAbout">
+      <view class="item-left">
+        <van-icon name="info-o" color="#FF69B4" size="40rpx" />
+        <text>关于我们</text>
+      </view>
+      <van-icon name="arrow" />
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-btn" bindtap="logout">退出登录</view>
+</view>
+
+<!-- 主题选择器弹窗 -->
+<van-popup show="{{ showThemePopup }}" round position="bottom" bind:close="closeThemeSelector">
+  <view class="theme-selector">
+    <view class="theme-title">选择主题色</view>
+    <view class="theme-list">
+      <view class="theme-item {{currentTheme.name === theme.name ? 'active' : ''}}" 
+            wx:for="{{themes}}" 
+            wx:key="name" 
+            wx:for-item="theme"
+            data-theme="{{theme}}"
+            bindtap="selectTheme"
+            style="background: {{theme.color}}">
+        <view class="theme-check" wx:if="{{currentTheme.name === theme.name}}">
+          <van-icon name="success" color="#fff" size="40rpx" />
+        </view>
+      </view>
+    </view>
+  </view>
+</van-popup> 

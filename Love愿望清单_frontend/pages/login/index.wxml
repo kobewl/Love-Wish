@@ -1,0 +1,25 @@
+<!-- 登录页面 -->
+<view class="login-container">
+  <!-- Logo -->
+  <view class="logo">
+    <image src="/images/logo.png" mode="aspectFit"></image>
+    <text class="title">Love愿望清单</text>
+  </view>
+
+  <!-- 登录按钮 -->
+  <view class="login-btn-area">
+    <button class="login-btn" open-type="getUserInfo" bindtap="login">
+      <image src="/images/wechat.png" mode="aspectFit"></image>
+      <text>微信一键登录</text>
+    </button>
+  </view>
+
+  <!-- 用户协议 -->
+  <view class="agreement">
+    <van-checkbox value="{{ agreementChecked }}" bind:change="toggleAgreement" icon-size="28rpx" checked-color="#07c160">
+      <view class="agreement-text">
+        我已阅读并同意<text class="link">《用户协议》</text>和<text class="link">《隐私政策》</text>
+      </view>
+    </van-checkbox>
+  </view>
+</view> 
