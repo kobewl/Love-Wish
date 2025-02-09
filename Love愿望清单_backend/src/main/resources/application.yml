@@ -9,6 +9,23 @@ spring:
     url: jdbc:mysql://39.98.107.158:3306/love_wish_db?use__db__Unicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
     password: kobe200800
+    hikari:
+      # 连接池名称
+      pool-name: HikariCP
+      # 最小空闲连接数
+      minimum-idle: 5
+      # 空闲连接存活最大时间，默认600000（10分钟）
+      idle-timeout: 180000
+      # 连接池最大连接数，默认是10
+      maximum-pool-size: 10
+      # 从连接池返回的连接的自动提交
+      auto-commit: true
+      # 连接最大存活时间，0表示永久存活，默认1800000（30分钟）
+      max-lifetime: 1800000
+      # 连接超时时间，默认30000（30秒）
+      connection-timeout: 30000
+      # 测试连接是否可用的查询语句
+      connection-test-query: SELECT 1
   redis:
     host: 39.98.107.158
     port: 6379

@@ -82,47 +82,75 @@
   >
     <view class="popup-content">
       <view class="popup-header">
-        <text class="popup-title">{{ editingWish ? '编辑愿望' : '添加愿望' }}</text>
-        <van-icon name="cross" bindtap="onCloseAddPopup" />
+        <view class="popup-title-section">
+          <text class="popup-title">{{ editingWish ? '编辑愿望' : '添加愿望' }}</text>
+          <text class="popup-subtitle">记录下你的美好愿望吧</text>
+        </view>
+        <view class="popup-close" bindtap="onCloseAddPopup">
+          <van-icon name="cross" size="44rpx" color="#999" />
+        </view>
       </view>
+      
       <view class="form-content">
-        <van-field
-          value="{{ newWish.title }}"
-          label="标题"
-          placeholder="请输入愿望标题"
-          bind:change="onTitleInput"
-          maxlength="50"
-          show-word-limit
-        />
-        <van-field
-          value="{{ newWish.description }}"
-          label="描述"
-          type="textarea"
-          placeholder="请输入愿望描述"
-          bind:change="onDescInput"
-          maxlength="200"
-          show-word-limit
-          autosize="{{ {minHeight: 100} }}"
-        />
-        <view class="image-upload">
-          <text class="upload-label">图片</text>
+        <view class="form-item">
+          <view class="form-label">
+            <van-icon name="edit" color="#FF69B4" size="36rpx" />
+            <text>标题</text>
+          </view>
+          <input 
+            class="form-input"
+            value="{{ newWish.title }}"
+            placeholder="请输入愿望标题"
+            maxlength="50"
+            bindinput="onTitleInput"
+          />
+          <text class="input-count">{{ newWish.title.length }}/50</text>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">
+            <van-icon name="description" color="#FF69B4" size="36rpx" />
+            <text>描述</text>
+          </view>
+          <textarea 
+            class="form-textarea"
+            value="{{ newWish.description }}"
+            placeholder="请输入愿望描述"
+            maxlength="200"
+            bindinput="onDescInput"
+          />
+          <text class="input-count">{{ newWish.description.length }}/200</text>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">
+            <van-icon name="photo" color="#FF69B4" size="36rpx" />
+            <text>图片</text>
+          </view>
           <view class="upload-content">
             <view class="image-preview" wx:if="{{ tempImageUrl }}">
               <image src="{{ tempImageUrl }}" mode="aspectFill"></image>
               <view class="delete-image" catchtap="deleteImage">
-                <van-icon name="cross" />
+                <van-icon name="cross" color="#fff" size="32rpx" />
               </view>
             </view>
             <view class="upload-btn" bindtap="chooseImage" wx:else>
-              <van-icon name="photo" />
+              <van-icon name="plus" size="48rpx" color="#999" />
               <text>上传图片</text>
             </view>
           </view>
         </view>
       </view>
+
       <view class="popup-footer">
-        <van-button plain type="default" block bindtap="onCloseAddPopup">取消</van-button>
-        <van-button type="primary" color="#FF69B4" block bindtap="onConfirmAdd">确定</van-button>
+        <button class="footer-btn cancel-btn" bindtap="onCloseAddPopup">
+          <van-icon name="close" />
+          <text>取消</text>
+        </button>
+        <button class="footer-btn confirm-btn" bindtap="onConfirmAdd">
+          <van-icon name="success" />
+          <text>确定</text>
+        </button>
       </view>
     </view>
   </van-popup>
