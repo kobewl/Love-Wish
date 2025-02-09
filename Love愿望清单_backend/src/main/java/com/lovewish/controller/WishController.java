@@ -72,8 +72,25 @@ public class WishController {
     @PutMapping("/{id}/status")
     public Result<Boolean> updateWishStatus(
             @PathVariable Long id,
-            @RequestParam Integer status) {
-        return Result.success(wishService.updateWishStatus(id, status));
+            @RequestBody Map<String, Integer> requestBody) {
+        try {
+            log.info("收到更新愿望状态请求, id: {}, requestBody: {}", id, requestBody);
+
+            Integer status = requestBody.get("status");
+            if (status == null || (status != 0 && status != 1)) {
+                log.warn("无效的状态值: {}", status);
+                return Result.error("无效的状态值");
+            }
+
+            log.info("开始更新愿望状态, id: {}, status: {}", id, status);
+            Boolean result = wishService.updateWishStatus(id, status);
+            log.info("更新愿望状态完成, id: {}, status: {}, result: {}", id, status, result);
+
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("更新愿望状态失败, id: " + id, e);
+            return Result.error("更新愿望状态失败：" + e.getMessage());
+        }
     }
 
     @ApiOperation("删除愿望")

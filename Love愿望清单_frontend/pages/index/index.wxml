@@ -65,9 +65,9 @@
             </view>
           </view>
           <view class="item-right">
-            <text class="days-count" wx:if="{{ item.daysUntil > 0 }}">{{ item.daysUntil }}天</text>
-            <text class="days-count today" wx:elif="{{ item.daysUntil === 0 }}">Today</text>
-            <text class="days-count passed" wx:else>{{ -item.daysUntil }}天前</text>
+            <text class="days-count" wx:if="{{ item.daysUntil > 0 }}">还有{{ item.daysUntil }}天</text>
+            <text class="days-count today" wx:elif="{{ item.daysUntil === 0 }}">就是今天</text>
+            <text class="days-count passed" wx:else>已过去{{ -item.daysUntil }}天</text>
           </view>
         </view>
       </block>
@@ -89,16 +89,16 @@
     </view>
     <view class="progress-content">
       <view class="progress-item">
-        <text class="label">已完成愿望</text>
-        <text class="value">{{ wishStats.completed || 0 }}</text>
+        <text class="label">已完成</text>
+        <text class="value">{{ wishStats.completed }}</text>
       </view>
       <view class="progress-item">
         <text class="label">进行中</text>
-        <text class="value">{{ wishStats.ongoing || 0 }}</text>
+        <text class="value">{{ wishStats.ongoing }}</text>
       </view>
       <view class="progress-item">
         <text class="label">完成率</text>
-        <text class="value">{{ wishStats.completionRate || '0%' }}</text>
+        <text class="value">{{ wishStats.completionRate }}</text>
       </view>
     </view>
   </view>

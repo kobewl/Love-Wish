@@ -283,6 +283,7 @@ Page({
     })
 
     try {
+      console.log('更新愿望状态:', { id, status, newStatus: status === 1 ? 0 : 1 })
       const res = await wx.request({
         url: `${app.globalData.baseUrl}/api/wish/${id}/status`,
         method: 'PUT',
@@ -295,14 +296,28 @@ Page({
         }
       })
 
+      console.log('更新响应:', res)
+
       if (res.statusCode === 200 && res.data.code === 0) {
-        this.getWishList()
+        wx.showToast({
+          title: '更新成功',
+          icon: 'success',
+          duration: 2000
+        })
+        // 重新获取列表
+        setTimeout(() => {
+          this.getWishList()
+        }, 1000)
       } else {
-        app.showError(res.data?.message || '更新失败')
+        throw new Error(res.data?.message || '更新失败')
       }
     } catch (err) {
       console.error('更新愿望状态失败:', err)
-      app.showError('网络请求失败')
+      wx.showToast({
+        title: err.message || '网络请求失败',
+        icon: 'none',
+        duration: 2000
+      })
     } finally {
       wx.hideLoading()
     }

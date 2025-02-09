@@ -65,7 +65,7 @@ page {
   min-height: 100vh;
   background: #f8f8f8;
   padding: 24rpx;
-  padding-top: 0;
+  padding-top: 120rpx;
 }
 
 .bg-gradient {
@@ -102,6 +102,7 @@ page {
   box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.06);
 }
 
+/* 卡片头部 */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -131,11 +132,7 @@ page {
   margin-right: 8rpx;
 }
 
-/* 情话卡片样式 */
-.love-words-card {
-  margin-top: 120rpx;
-}
-
+/* 情话卡片 */
 .love-words-content {
   padding: 24rpx;
   background: #fff9fb;
@@ -148,7 +145,7 @@ page {
   line-height: 1.6;
 }
 
-/* 纪念日列表样式 */
+/* 纪念日列表 */
 .anniversary-list {
   margin-top: 24rpx;
 }
@@ -212,20 +209,7 @@ page {
   color: #999;
 }
 
-.empty-tip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 48rpx 0;
-  color: #999;
-  font-size: 28rpx;
-}
-
-.empty-tip text {
-  margin-top: 16rpx;
-}
-
-/* 愿望进度样式 */
+/* 愿望进度 */
 .progress-content {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -252,6 +236,20 @@ page {
   font-size: 36rpx;
   color: #ff69b4;
   font-weight: 600;
+}
+
+/* 空状态 */
+.empty-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.empty-tip text {
+  margin-top: 16rpx;
 }
 
 /* 情侣卡片 */
@@ -329,10 +327,6 @@ page {
 }
 
 /* 纪念日卡片 */
-.anniversary-list {
-  margin-top: 24rpx;
-}
-
 .anniversary-item {
   padding: 24rpx 0;
   border-bottom: 1px solid var(--border-color);

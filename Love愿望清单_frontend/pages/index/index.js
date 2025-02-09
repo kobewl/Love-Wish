@@ -133,14 +133,20 @@ Page({
       const token = wx.getStorageSync('token')
       if (!token) throw new Error('未登录')
 
-      const res = await wx.request({
-        url: `${app.globalData.baseUrl}/api/anniversary/recent`,
-        method: 'GET',
-        header: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${app.globalData.baseUrl}/api/anniversary/recent`,
+          method: 'GET',
+          header: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          success: resolve,
+          fail: reject
+        })
       })
+
+      console.log('近期纪念日响应:', res)
 
       if (res.statusCode === 200 && res.data && res.data.code === 0) {
         const records = res.data.data || []
@@ -197,13 +203,28 @@ Page({
   },
   // 加载页面数据
   async loadPageData() {
-    Promise.all([
-      this.getRecentAnniversaries(),
-      this.getWishStats(),
-      this.getTodayLoveWords()
-    ]).catch(err => {
-      console.error('加载页面数据失败:', err)
+    wx.showLoading({
+      title: '加载中...',
+      mask: true
     })
+    
+    try {
+      const [anniversaryRes, wishRes, loveWordsRes] = await Promise.all([
+        this.getRecentAnniversaries(),
+        this.getWishStats(),
+        this.getTodayLoveWords()
+      ])
+      
+      console.log('加载数据结果:', {
+        anniversaryRes,
+        wishRes,
+        loveWordsRes
+      })
+    } catch (err) {
+      console.error('加载页面数据失败:', err)
+    } finally {
+      wx.hideLoading()
+    }
   },
   // 获取愿望统计
   async getWishStats() {
@@ -211,14 +232,20 @@ Page({
       const token = wx.getStorageSync('token')
       if (!token) throw new Error('未登录')
 
-      const res = await wx.request({
-        url: `${app.globalData.baseUrl}/api/wish/stats`,
-        method: 'GET',
-        header: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${app.globalData.baseUrl}/api/wish/stats`,
+          method: 'GET',
+          header: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          success: resolve,
+          fail: reject
+        })
       })
+
+      console.log('愿望统计响应:', res)
 
       if (res.statusCode === 200 && res.data && res.data.code === 0) {
         const stats = res.data.data || {}
@@ -245,14 +272,20 @@ Page({
       const token = wx.getStorageSync('token')
       if (!token) throw new Error('未登录')
 
-      const res = await wx.request({
-        url: `${app.globalData.baseUrl}/api/love-words/today`,
-        method: 'GET',
-        header: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${app.globalData.baseUrl}/api/love-words/today`,
+          method: 'GET',
+          header: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          success: resolve,
+          fail: reject
+        })
       })
+
+      console.log('今日情话响应:', res)
 
       if (res.statusCode === 200 && res.data && res.data.code === 0) {
         this.setData({
