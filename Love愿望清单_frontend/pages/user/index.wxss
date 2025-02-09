@@ -138,8 +138,15 @@
   text-align: center;
   background: #fff;
   border-radius: 44rpx;
-  color: #ff69b4;
+  color: #ff4d4f;
   font-size: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+}
+
+.logout-btn:active {
+  transform: scale(0.98);
+  background: #fafafa;
 }
 
 /* 主题选择器 */

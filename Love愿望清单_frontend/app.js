@@ -2,17 +2,28 @@
 App({
   globalData: {
     // 根据环境切换baseUrl
-    baseUrl: 'http://localhost:8080',  // 本地开发环境
+    baseUrl: 'http://127.0.0.1:8080',  // 本地开发环境
     // baseUrl: 'https://your-domain.com', // 生产环境
-    userInfo: null
+    userInfo: null,
+    token: null
   },
   
   onLaunch() {
     // 检查登录状态
     const token = wx.getStorageSync('token')
     if (token) {
+      this.globalData.token = token
       this.globalData.userInfo = wx.getStorageSync('userInfo')
     }
+
+    // 获取系统信息
+    wx.getSystemInfo({
+      success: (res) => {
+        this.globalData.systemInfo = res
+        this.globalData.statusBarHeight = res.statusBarHeight
+        this.globalData.navBarHeight = 44 + res.statusBarHeight
+      }
+    })
 
     // 打印环境信息，方便调试
     console.log('当前环境:', __wxConfig.envVersion)
@@ -22,5 +33,48 @@ App({
     const logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
+  },
+
+  // 检查登录状态
+  checkLoginStatus() {
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      wx.redirectTo({
+        url: '/pages/login/index'
+      })
+      return false
+    }
+    return true
+  },
+
+  // 显示错误提示
+  showError(msg) {
+    wx.showToast({
+      title: msg || '操作失败',
+      icon: 'none',
+      duration: 2000
+    })
+  },
+
+  // 显示成功提示
+  showSuccess(msg) {
+    wx.showToast({
+      title: msg || '操作成功',
+      icon: 'success',
+      duration: 2000
+    })
+  },
+
+  // 显示加载提示
+  showLoading(msg) {
+    wx.showLoading({
+      title: msg || '加载中...',
+      mask: true
+    })
+  },
+
+  // 隐藏加载提示
+  hideLoading() {
+    wx.hideLoading()
   }
 })

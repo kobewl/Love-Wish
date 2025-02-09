@@ -6,12 +6,13 @@ Page({
     minDate: new Date(2000, 0, 1).getTime(),
     maxDate: new Date(2099, 11, 31).getTime(),
     anniversaryList: [],
+    loading: true,
     showAddPopup: false,
     showDetailPopup: false,
     currentAnniversary: null,
     newAnniversary: {
       title: '',
-      date: '',
+      date: dayjs().format('YYYY-MM-DD'),
       type: 0,
       repeatType: 0,
       reminderDays: 7
@@ -20,28 +21,20 @@ Page({
     repeatOptions: ['不重复', '每年重复'],
     reminderOptions: ['不提醒', '提前1天', '提前3天', '提前7天', '提前14天', '提前30天'],
     reminderDaysMap: [0, 1, 3, 7, 14, 30],
-    reminderIndex: 3, // 默认提前7天
+    reminderIndex: 3,
+    showRepeatPicker: false,
+    showDatePicker: false,
+    showTypePicker: false,
+    showReminderPicker: false,
     animationData: {},
     slideAnimation: {},
-    formatter(day) {
-      const anniversaries = this.data.anniversaryList || []
-      const date = dayjs(day.date).format('YYYY-MM-DD')
-      const matched = anniversaries.find(item => {
-        if (item.repeatType === 0) {
-          return item.date === date
-        } else {
-          return dayjs(item.date).format('MM-DD') === dayjs(date).format('MM-DD')
-        }
-      })
-      if (matched) {
-        day.bottomInfo = matched.title
-        day.className = 'anniversary-day'
-      }
-      return day
-    }
+    listAnimations: [],
+    calendarFormatter: null
   },
 
   onLoad() {
+    if (!app.checkLoginStatus()) return
+    
     // 创建动画实例
     this.animation = wx.createAnimation({
       duration: 300,
@@ -54,20 +47,18 @@ Page({
       timingFunction: 'ease-out',
     })
 
-    // 获取纪念日列表
-    this.getAnniversaryList()
+    // 设置日历formatter
+    this.setData({
+      calendarFormatter: this.formatter.bind(this)
+    }, () => {
+      // 在设置完formatter后再获取纪念日列表
+      this.getAnniversaryList()
+    })
   },
 
   onShow() {
-    // 检查登录状态
-    const token = wx.getStorageSync('token')
-    if (!token) {
-      wx.redirectTo({
-        url: '/pages/login/index'
-      })
-      return
-    }
-
+    if (!app.checkLoginStatus()) return
+    
     // 执行添加按钮动画
     this.executeAddButtonAnimation()
   },
@@ -98,11 +89,7 @@ Page({
 
   // 获取纪念日列表
   async getAnniversaryList() {
-    wx.showLoading({
-      title: '加载中...',
-      mask: true
-    })
-
+    this.setData({ loading: true, anniversaryList: [] })
     try {
       const res = await wx.request({
         url: `${app.globalData.baseUrl}/api/anniversary/my`,
@@ -114,41 +101,33 @@ Page({
       })
 
       if (res.statusCode === 200 && res.data.code === 0) {
-        const list = res.data.data.records.map(item => ({
-          ...item,
-          daysUntil: this.calculateDaysUntil(item.date, item.repeatType)
+        const records = res.data.data.records || []
+        const processedList = records.map(item => ({
+          id: item.id,
+          title: item.title.substring(0, 20), // 限制标题长度
+          date: item.date,
+          type: item.type || 0,
+          repeatType: item.repeatType || 0,
+          reminderDays: item.reminderDays || 7,
+          daysUntil: this.calculateDaysUntil(item.date, item.repeatType || 0)
         }))
-        
-        // 初始化列表动画状态
-        const listAnimations = list.map(() => {
-          return wx.createAnimation({
-            duration: 0,
-          }).translateX('100%').opacity(0).step().export()
-        })
 
-        this.setData({
-          anniversaryList: list,
-          listAnimations
-        }, () => {
-          // 执行列表滑入动画
-          setTimeout(() => {
-            this.executeListAnimation()
-          }, 100)
-        })
-      } else {
-        wx.showToast({
-          title: res.data?.message || '获取纪念日列表失败',
-          icon: 'none'
-        })
+        // 分批次设置数据
+        const batchSize = 5
+        for (let i = 0; i < processedList.length; i += batchSize) {
+          const batch = processedList.slice(i, i + batchSize)
+          await new Promise(resolve => {
+            this.setData({
+              anniversaryList: this.data.anniversaryList.concat(batch)
+            }, resolve)
+          })
+        }
       }
     } catch (err) {
       console.error('获取纪念日列表失败:', err)
-      wx.showToast({
-        title: '网络请求失败',
-        icon: 'none'
-      })
+      app.showError('网络请求失败')
     } finally {
-      wx.hideLoading()
+      this.setData({ loading: false })
     }
   },
 
@@ -269,24 +248,15 @@ Page({
   async onConfirmAdd() {
     const { title, date } = this.data.newAnniversary
     if (!title) {
-      wx.showToast({
-        title: '请输入标题',
-        icon: 'none'
-      })
+      app.showError('请输入标题')
       return
     }
     if (!date) {
-      wx.showToast({
-        title: '请选择日期',
-        icon: 'none'
-      })
+      app.showError('请选择日期')
       return
     }
 
-    wx.showLoading({
-      title: '添加中...',
-      mask: true
-    })
+    app.showLoading('添加中...')
 
     try {
       const res = await wx.request({
@@ -300,32 +270,20 @@ Page({
       })
 
       if (res.statusCode === 200 && res.data.code === 0) {
-        // 添加成功动画
-        wx.showToast({
-          title: '添加成功',
-          icon: 'success'
-        })
-        
+        app.showSuccess('添加成功')
         this.setData({
           showAddPopup: false
         })
-        
         // 重新加载列表并执行动画
         this.getAnniversaryList()
       } else {
-        wx.showToast({
-          title: res.data?.message || '添加失败',
-          icon: 'none'
-        })
+        app.showError(res.data?.message || '添加失败')
       }
     } catch (err) {
       console.error('添加纪念日失败:', err)
-      wx.showToast({
-        title: '网络请求失败',
-        icon: 'none'
-      })
+      app.showError('网络请求失败')
     } finally {
-      wx.hideLoading()
+      app.hideLoading()
     }
   },
 
@@ -390,6 +348,120 @@ Page({
         ...this.data.currentAnniversary
       },
       reminderIndex: this.getReminderIndex(this.data.currentAnniversary.reminderDays)
+    })
+  },
+
+  // 日历格式化函数
+  formatter(day) {
+    if (!day || !this.data.anniversaryList) return day
+    const date = dayjs(day.date).format('YYYY-MM-DD')
+    const matched = this.data.anniversaryList.find(item => {
+      if (!item || !item.date) return false
+      if (item.repeatType === 0) {
+        return item.date === date
+      } else {
+        return dayjs(item.date).format('MM-DD') === dayjs(date).format('MM-DD')
+      }
+    })
+    
+    if (matched) {
+      return {
+        ...day,
+        bottomInfo: matched.title.substring(0, 6) + '...',
+        className: 'anniversary-day'
+      }
+    }
+    return day
+  },
+
+  // 显示重复类型选择器
+  onShowRepeatPicker() {
+    this.setData({
+      showRepeatPicker: true
+    })
+  },
+
+  // 关闭重复类型选择器
+  onCloseRepeatPicker() {
+    this.setData({
+      showRepeatPicker: false
+    })
+  },
+
+  // 确认重复类型选择
+  onConfirmRepeatPicker(e) {
+    this.setData({
+      'newAnniversary.repeatType': parseInt(e.detail.value),
+      showRepeatPicker: false
+    })
+  },
+
+  // 取消重复类型选择
+  onCancelRepeatPicker() {
+    this.setData({
+      showRepeatPicker: false
+    })
+  },
+
+  // 显示日期选择器
+  onShowDatePicker() {
+    this.setData({ showDatePicker: true })
+  },
+
+  // 关闭日期选择器
+  onCloseDatePicker() {
+    this.setData({ showDatePicker: false })
+  },
+
+  // 确认日期选择
+  onConfirmDatePicker(e) {
+    this.setData({
+      'newAnniversary.date': dayjs(e.detail).format('YYYY-MM-DD'),
+      showDatePicker: false
+    })
+  },
+
+  // 显示类型选择器
+  onShowTypePicker() {
+    this.setData({ showTypePicker: true })
+  },
+
+  // 关闭类型选择器
+  onCloseTypePicker() {
+    this.setData({ showTypePicker: false })
+  },
+
+  // 确认类型选择
+  onConfirmTypePicker(e) {
+    this.setData({
+      'newAnniversary.type': e.detail.index,
+      showTypePicker: false
+    })
+  },
+
+  // 显示提醒选择器
+  onShowReminderPicker() {
+    this.setData({ showReminderPicker: true })
+  },
+
+  // 关闭提醒选择器
+  onCloseReminderPicker() {
+    this.setData({ showReminderPicker: false })
+  },
+
+  // 确认提醒选择
+  onConfirmReminderPicker(e) {
+    this.setData({
+      reminderIndex: e.detail.index,
+      'newAnniversary.reminderDays': this.data.reminderDaysMap[e.detail.index],
+      showReminderPicker: false
+    })
+  },
+
+  // 取消提醒选择
+  onCancelReminderPicker() {
+    this.setData({
+      showReminderPicker: false
     })
   }
 }) 

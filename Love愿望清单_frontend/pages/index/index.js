@@ -67,36 +67,63 @@ Page({
     this.getWishProgress()
     this.getDailyLove()
   },
-  async checkLoginStatus() {
+  onShow() {
+    if (wx.getStorageSync('token')) {
+      this.getUserInfo()
+      this.getRelationInfo()
+    }
+  },
+  checkLoginStatus() {
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      wx.redirectTo({
+        url: '/pages/login/index'
+      })
+    }
+  },
+  async getUserInfo() {
     try {
-      const token = wx.getStorageSync('token')
-      if (!token) {
-        wx.navigateTo({
-          url: '/pages/login/index'
+      const res = await wx.request({
+        url: `${app.globalData.baseUrl}/api/user/info`,
+        method: 'GET',
+        header: {
+          'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (res.statusCode === 200 && res.data.code === 0) {
+        this.setData({
+          userInfo: res.data.data
         })
-        return
       }
-      const userInfo = await this.getUserInfo()
-      this.setData({ userInfo })
     } catch (err) {
-      console.error('检查登录状态失败:', err)
+      console.error('获取用户信息失败:', err)
     }
   },
   async getRelationInfo() {
     try {
-      // TODO: 调用后端API
-      const relationInfo = {
-        days: 365,
-        relationId: 'test123',
-        status: 'ACTIVE'
+      const userInfo = wx.getStorageSync('userInfo')
+      if (!userInfo || !userInfo.pairedUserId) {
+        return
       }
-      this.setData({ relationInfo })
-      if(relationInfo.status === 'ACTIVE') {
-        const partnerInfo = await this.getPartnerInfo()
-        this.setData({ partnerInfo })
+
+      const res = await wx.request({
+        url: `${app.globalData.baseUrl}/api/user/${userInfo.pairedUserId}`,
+        method: 'GET',
+        header: {
+          'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (res.statusCode === 200 && res.data.code === 0) {
+        this.setData({
+          partnerInfo: res.data.data
+        })
       }
     } catch (err) {
-      console.error('获取情侣关系失败:', err)
+      console.error('获取配对信息失败:', err)
     }
   },
   async getRecentAnniversaries() {

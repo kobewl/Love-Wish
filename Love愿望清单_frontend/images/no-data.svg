@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="200px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <!-- 背景圆 -->
+        <circle fill="#FFE4E1" cx="100" cy="100" r="80"/>
+        
+        <!-- 日历图标 -->
+        <path d="M70,60 L130,60 C140,60 145,65 145,75 L145,125 C145,135 140,140 130,140 L70,140 C60,140 55,135 55,125 L55,75 C55,65 60,60 70,60 Z" 
+              fill="#FF69B4" opacity="0.2"/>
+        <path d="M75,50 L80,50 L80,70 L75,70 L75,50 Z M120,50 L125,50 L125,70 L120,70 L120,50 Z" 
+              fill="#FF69B4"/>
+        <path d="M65,80 L135,80" stroke="#FF69B4" stroke-width="2" stroke-linecap="round"/>
+        
+        <!-- 表情 -->
+        <path d="M85,100 C85,95 90,90 95,90 C100,90 105,95 105,100" 
+              stroke="#FF69B4" stroke-width="3" stroke-linecap="round"/>
+        <path d="M95,120 C95,115 100,110 105,110 C110,110 115,115 115,120" 
+              stroke="#FF69B4" stroke-width="3" stroke-linecap="round"/>
+    </g>
+</svg> 

@@ -13,12 +13,10 @@
     "enhance": true,
     "showShadowRootInWxmlPanel": true,
     "packNpmManually": true,
-    "packNpmRelationList": [
-      {
-        "packageJsonPath": "./package.json",
-        "miniprogramNpmDistDir": "./"
-      }
-    ],
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "useStaticServer": true,
+    "staticServerRoot": "static/",
     "babelSetting": {
       "ignore": [],
       "disablePlugins": [],
@@ -26,7 +24,12 @@
     },
     "useCompilerPlugins": false,
     "nodeModules": true,
-    "urlCheck": false
+    "urlCheck": false,
+    "checkSiteMap": false,
+    "ignoreUploadUnusedFiles": true,
+    "useMultiFrameRuntime": true,
+    "useApiHook": true,
+    "useApiHostProcess": true
   },
   "condition": {},
   "editorSetting": {

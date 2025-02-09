@@ -5,6 +5,11 @@
   "usingComponents": {
     "van-calendar": "@vant/weapp/calendar/index",
     "van-popup": "@vant/weapp/popup/index",
-    "van-icon": "@vant/weapp/icon/index"
+    "van-icon": "@vant/weapp/icon/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-datetime-picker": "@vant/weapp/datetime-picker/index",
+    "van-picker": "@vant/weapp/picker/index",
+    "van-loading": "@vant/weapp/loading/index"
   }
 } 

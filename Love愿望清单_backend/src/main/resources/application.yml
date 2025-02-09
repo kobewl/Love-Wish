@@ -6,7 +6,7 @@ spring:
     name: love-wish-backend
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://39.98.107.158:3306/love_wish?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://39.98.107.158:3306/love_wish_db?use__db__Unicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
     password: kobe200800
   redis:
@@ -20,6 +20,9 @@ spring:
         max-wait: -1
         max-idle: 8
         min-idle: 0
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml

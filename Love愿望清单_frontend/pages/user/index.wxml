@@ -84,24 +84,24 @@
 
   <!-- 退出登录 -->
   <view class="logout-btn" bindtap="logout">退出登录</view>
-</view>
 
-<!-- 主题选择器弹窗 -->
-<van-popup show="{{ showThemePopup }}" round position="bottom" bind:close="closeThemeSelector">
-  <view class="theme-selector">
-    <view class="theme-title">选择主题色</view>
-    <view class="theme-list">
-      <view class="theme-item {{currentTheme.name === theme.name ? 'active' : ''}}" 
-            wx:for="{{themes}}" 
-            wx:key="name" 
-            wx:for-item="theme"
-            data-theme="{{theme}}"
-            bindtap="selectTheme"
-            style="background: {{theme.color}}">
-        <view class="theme-check" wx:if="{{currentTheme.name === theme.name}}">
-          <van-icon name="success" color="#fff" size="40rpx" />
+  <!-- 主题选择器弹窗 -->
+  <van-popup show="{{ showThemePopup }}" round position="bottom" bind:close="closeThemeSelector">
+    <view class="theme-selector">
+      <view class="theme-title">选择主题色</view>
+      <view class="theme-list">
+        <view class="theme-item {{currentTheme.name === theme.name ? 'active' : ''}}" 
+              wx:for="{{themes}}" 
+              wx:key="name" 
+              wx:for-item="theme"
+              data-theme="{{theme}}"
+              bindtap="selectTheme"
+              style="background: {{theme.color}}">
+          <view class="theme-check" wx:if="{{currentTheme.name === theme.name}}">
+            <van-icon name="success" color="#fff" size="40rpx" />
+          </view>
         </view>
       </view>
     </view>
-  </view>
-</van-popup> 
+  </van-popup>
+</view> 

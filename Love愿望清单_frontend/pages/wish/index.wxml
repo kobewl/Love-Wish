@@ -1,57 +1,129 @@
 <view class="wish-container">
-  <!-- Tab 切换 -->
-  <van-tabs 
-    active="{{ activeTab }}" 
-    bind:change="onTabChange"
-    color="var(--primary-color)"
-    title-active-color="var(--primary-color)"
-    swipeable
-  >
-    <van-tab 
-      wx:for="{{tabs}}" 
-      wx:key="type"
-      title="{{item.title}}"
-    >
-      <!-- 愿望列表 -->
-      <view class="wish-list">
-        <view wx:if="{{!wishList.length}}" class="empty-box">
-          <image class="empty-img" src="/assets/images/empty-wish.png" mode="aspectFit"/>
-          <text class="empty-text">暂无愿望清单~</text>
-        </view>
-        <view 
-          wx:for="{{wishList}}" 
-          wx:key="id"
-          class="wish-item card"
-        >
-          <view class="wish-header flex justify-between items-center">
-            <view class="flex items-center">
-              <view class="type-tag {{item.type}}">{{item.typeText}}</view>
-              <text class="status">{{item.statusText}}</text>
+  <!-- 顶部背景 -->
+  <view class="bg-gradient"></view>
+
+  <!-- 头部区域 -->
+  <view class="header">
+    <view class="title-section">
+      <text class="main-title">愿望清单</text>
+      <text class="sub-title">记录美好，实现梦想</text>
+    </view>
+    <view class="add-btn-wrapper">
+      <view class="add-btn" bindtap="showAddPopup">
+        <van-icon name="plus" color="#fff" size="24px" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 愿望列表 -->
+  <view class="wish-list">
+    <view class="loading-container" wx:if="{{ loading }}">
+      <van-loading type="spinner" color="#FF69B4" size="24px">加载中...</van-loading>
+    </view>
+    <block wx:elif="{{ wishList && wishList.length > 0 }}">
+      <view 
+        class="wish-card {{ item.status === 1 ? 'completed' : '' }}" 
+        wx:for="{{ wishList }}" 
+        wx:key="id"
+        bindtap="showDetailPopup"
+        data-item="{{ item }}"
+      >
+        <view class="wish-content">
+          <view class="wish-header">
+            <view class="wish-title">{{ item.title }}</view>
+            <view class="wish-status {{ item.status === 1 ? 'completed' : '' }}">
+              {{ item.status === 1 ? '已完成' : '进行中' }}
             </view>
-            <text class="date">{{item.createTime}}</text>
           </view>
-          <view class="wish-content">
-            <text class="title">{{item.title}}</text>
-            <text class="desc">{{item.content}}</text>
+          <view class="wish-desc" wx:if="{{ item.description }}">{{ item.description }}</view>
+          <view class="wish-image" wx:if="{{ item.imageUrl }}">
+            <image src="{{ item.imageUrl }}" mode="aspectFill"></image>
           </view>
-          <view class="wish-footer flex justify-between items-center">
-            <view class="progress-box">
-              <text class="progress-text">完成进度 {{item.progress}}%</text>
-              <view class="progress-bar">
-                <view class="progress" style="width:{{item.progress}}%"></view>
+          <view class="wish-footer">
+            <view class="wish-time">{{ item.createTime }}</view>
+            <view class="wish-actions">
+              <view class="action-btn complete" catchtap="toggleWishStatus" data-id="{{ item.id }}" data-status="{{ item.status }}">
+                <van-icon name="{{ item.status === 1 ? 'success' : 'circle' }}" />
+                <text>{{ item.status === 1 ? '已完成' : '完成' }}</text>
               </view>
-            </view>
-            <view class="action-box">
-              <button class="btn btn-sm" bindtap="viewDetail" data-id="{{item.id}}">查看</button>
+              <view class="action-btn edit" catchtap="editWish" data-item="{{ item }}">
+                <van-icon name="edit" />
+                <text>编辑</text>
+              </view>
+              <view class="action-btn delete" catchtap="deleteWish" data-id="{{ item.id }}">
+                <van-icon name="delete" />
+                <text>删除</text>
+              </view>
             </view>
           </view>
         </view>
       </view>
-    </van-tab>
-  </van-tabs>
-
-  <!-- 悬浮按钮 -->
-  <view class="fab-btn" bindtap="createWish">
-    <van-icon name="plus" size="24px" color="#fff"/>
+    </block>
+    <view class="empty-container" wx:else>
+      <image class="empty-image" src="/static/images/empty.png" mode="aspectFit"></image>
+      <view class="empty-text">
+        <text class="empty-title">还没有愿望清单~</text>
+        <text class="empty-desc">点击右上角的"+"添加你的第一个愿望吧</text>
+      </view>
+      <view class="add-first-btn" bindtap="showAddPopup">
+        <van-icon name="plus" />
+        <text>添加愿望</text>
+      </view>
+    </view>
   </view>
+
+  <!-- 添加愿望弹窗 -->
+  <van-popup
+    show="{{ showAddPopup }}"
+    round
+    position="bottom"
+    bind:close="onCloseAddPopup"
+    custom-style="min-height: 65%"
+  >
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">{{ editingWish ? '编辑愿望' : '添加愿望' }}</text>
+        <van-icon name="cross" bindtap="onCloseAddPopup" />
+      </view>
+      <view class="form-content">
+        <van-field
+          value="{{ newWish.title }}"
+          label="标题"
+          placeholder="请输入愿望标题"
+          bind:change="onTitleInput"
+          maxlength="50"
+          show-word-limit
+        />
+        <van-field
+          value="{{ newWish.description }}"
+          label="描述"
+          type="textarea"
+          placeholder="请输入愿望描述"
+          bind:change="onDescInput"
+          maxlength="200"
+          show-word-limit
+          autosize="{{ {minHeight: 100} }}"
+        />
+        <view class="image-upload">
+          <text class="upload-label">图片</text>
+          <view class="upload-content">
+            <view class="image-preview" wx:if="{{ tempImageUrl }}">
+              <image src="{{ tempImageUrl }}" mode="aspectFill"></image>
+              <view class="delete-image" catchtap="deleteImage">
+                <van-icon name="cross" />
+              </view>
+            </view>
+            <view class="upload-btn" bindtap="chooseImage" wx:else>
+              <van-icon name="photo" />
+              <text>上传图片</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="popup-footer">
+        <van-button plain type="default" block bindtap="onCloseAddPopup">取消</van-button>
+        <van-button type="primary" color="#FF69B4" block bindtap="onConfirmAdd">确定</van-button>
+      </view>
+    </view>
+  </van-popup>
 </view> 

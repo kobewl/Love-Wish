@@ -7,12 +7,13 @@
     "pages/login/index"
   ],
   "window": {
-    "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "Love Wish",
-    "navigationBarBackgroundColor": "#FF69B4",
-    "backgroundColor": "#f7f7f7"
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "Love愿望清单",
+    "navigationBarTextStyle": "black"
   },
   "tabBar": {
+    "custom": false,
     "color": "#999999",
     "selectedColor": "#FF69B4",
     "backgroundColor": "#ffffff",
@@ -21,31 +22,34 @@
       {
         "pagePath": "pages/index/index",
         "text": "首页",
-        "iconPath": "/images/tabbar/home.png",
-        "selectedIconPath": "/images/tabbar/home-active.png"
+        "iconPath": "images/tabbar/home.png",
+        "selectedIconPath": "images/tabbar/home-active.png"
       },
       {
-        "pagePath": "pages/anniversary/index", 
+        "pagePath": "pages/anniversary/index",
         "text": "纪念日",
-        "iconPath": "/images/tabbar/calendar.png",
-        "selectedIconPath": "/images/tabbar/calendar-active.png"
+        "iconPath": "images/tabbar/calendar.png",
+        "selectedIconPath": "images/tabbar/calendar-active.png"
       },
       {
         "pagePath": "pages/wish/index",
         "text": "愿望",
-        "iconPath": "/images/tabbar/star.png",
-        "selectedIconPath": "/images/tabbar/star-active.png"
+        "iconPath": "images/tabbar/star.png",
+        "selectedIconPath": "images/tabbar/star-active.png"
       },
       {
         "pagePath": "pages/user/index",
         "text": "我的",
-        "iconPath": "/images/tabbar/user.png",
-        "selectedIconPath": "/images/tabbar/user-active.png"
+        "iconPath": "images/tabbar/user.png",
+        "selectedIconPath": "images/tabbar/user-active.png"
       }
     ]
   },
   "style": "v2",
   "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "useExtendedLib": {
+    "weui": true
+  }
 }

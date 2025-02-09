@@ -1,36 +1,44 @@
 <view class="anniversary-container">
+  <!-- 顶部背景 -->
+  <view class="bg-top"></view>
+
   <!-- 日历组件 -->
-  <van-calendar
-    show-title="{{ false }}"
-    show-confirm="{{ false }}"
-    min-date="{{ minDate }}"
-    max-date="{{ maxDate }}"
-    formatter="{{ formatter }}"
-    bind:select="onSelectDate"
-    class="calendar"
-    poppable="{{ false }}"
-    show-mark="{{ false }}"
-  />
+  <view class="calendar-section">
+    <van-calendar
+      show-title="{{ false }}"
+      show-confirm="{{ false }}"
+      min-date="{{ minDate }}"
+      max-date="{{ maxDate }}"
+      formatter="{{ formatter }}"
+      bind:select="onSelectDate"
+      class="calendar"
+      poppable="{{ false }}"
+      show-mark="{{ false }}"
+      safe-area-inset-bottom="{{ false }}"
+    />
+  </view>
 
   <!-- 纪念日列表 -->
   <view class="anniversary-list">
     <view class="list-header">
       <text class="title">我的纪念日</text>
-      <view class="add-btn" bindtap="showAddPopup" animation="{{ animationData }}">
+      <view class="add-btn" bindtap="showAddPopup">
         <van-icon name="plus" color="#FF69B4" size="40rpx" />
       </view>
     </view>
 
     <!-- 列表内容 -->
     <view class="list-content">
-      <block wx:if="{{ anniversaryList.length > 0 }}">
+      <view class="loading-container" wx:if="{{ loading }}">
+        <van-loading type="spinner" color="#FF69B4" size="24px">加载中...</van-loading>
+      </view>
+      <block wx:elif="{{ anniversaryList && anniversaryList.length > 0 }}">
         <view 
           class="anniversary-item" 
           wx:for="{{ anniversaryList }}" 
           wx:key="id" 
           bindtap="showDetailPopup" 
           data-item="{{ item }}"
-          animation="{{ listAnimations[index] }}"
         >
           <view class="item-left">
             <view class="item-type" style="background: {{ item.type === 0 ? '#FF69B4' : item.type === 1 ? '#FFB6C1' : '#FFC0CB' }}">
@@ -49,9 +57,10 @@
           </view>
         </view>
       </block>
-      <view class="empty-tip" wx:else>
-        <image src="/assets/images/empty-anniversary.png" mode="aspectFit"></image>
-        <text>还没有添加纪念日哦~\n快来记录你们的第一个纪念日吧</text>
+      <view class="empty-container" wx:else>
+        <image class="empty-image" src="/images/no-data.png" mode="aspectFit"></image>
+        <text class="empty-text">还没有添加纪念日哦~</text>
+        <text class="empty-text">快来记录你们的第一个纪念日吧</text>
       </view>
     </view>
   </view>
@@ -65,38 +74,109 @@
     custom-style="min-height: 60%"
   >
     <view class="popup-content">
-      <view class="popup-title">添加纪念日</view>
-      <view class="form-item">
-        <text class="label">标题</text>
-        <input class="input" placeholder="请输入纪念日标题" value="{{ newAnniversary.title }}" bindinput="onTitleInput" />
+      <view class="popup-header">
+        <text class="popup-title">添加纪念日</text>
+        <van-icon name="cross" bindtap="onCloseAddPopup" />
       </view>
-      <view class="form-item">
-        <text class="label">日期</text>
-        <picker mode="date" value="{{ newAnniversary.date }}" bindchange="onDateChange">
-          <view class="picker">{{ newAnniversary.date || '请选择日期' }}</view>
-        </picker>
+      <view class="form-content">
+        <van-field
+          value="{{ newAnniversary.title }}"
+          label="标题"
+          placeholder="请输入纪念日标题"
+          bind:change="onTitleInput"
+        />
+        <van-field
+          value="{{ newAnniversary.date }}"
+          label="日期"
+          placeholder="请选择日期"
+          readonly
+          bindtap="onShowDatePicker"
+        />
+        <van-popup
+          show="{{ showDatePicker }}"
+          position="bottom"
+          round
+          bind:close="onCloseDatePicker"
+        >
+          <van-datetime-picker
+            type="date"
+            value="{{ minDate }}"
+            min-date="{{ minDate }}"
+            max-date="{{ maxDate }}"
+            bind:confirm="onConfirmDatePicker"
+            bind:cancel="onCloseDatePicker"
+          />
+        </van-popup>
+        <van-field
+          value="{{ typeOptions[newAnniversary.type] }}"
+          label="类型"
+          placeholder="请选择类型"
+          readonly
+          bindtap="onShowTypePicker"
+        />
+        <van-popup
+          show="{{ showTypePicker }}"
+          position="bottom"
+          round
+          bind:close="onCloseTypePicker"
+        >
+          <van-picker
+            show-toolbar
+            title="选择类型"
+            columns="{{ typeOptions }}"
+            default-index="{{ newAnniversary.type }}"
+            bind:cancel="onCloseTypePicker"
+            bind:confirm="onConfirmTypePicker"
+          />
+        </van-popup>
+        <van-field
+          value="{{ repeatOptions[newAnniversary.repeatType] }}"
+          label="重复"
+          placeholder="请选择重复类型"
+          readonly
+          bindtap="onShowRepeatPicker"
+        />
+        <van-popup
+          show="{{ showRepeatPicker }}"
+          position="bottom"
+          round
+          bind:close="onCloseRepeatPicker"
+        >
+          <van-picker
+            show-toolbar
+            title="选择重复类型"
+            columns="{{ repeatOptions }}"
+            default-index="{{ newAnniversary.repeatType }}"
+            bind:cancel="onCancelRepeatPicker"
+            bind:confirm="onConfirmRepeatPicker"
+          />
+        </van-popup>
+        <van-field
+          value="{{ reminderOptions[reminderIndex] }}"
+          label="提醒"
+          placeholder="请选择提醒时间"
+          readonly
+          bindtap="onShowReminderPicker"
+        />
+        <van-popup
+          show="{{ showReminderPicker }}"
+          position="bottom"
+          round
+          bind:close="onCloseReminderPicker"
+        >
+          <van-picker
+            show-toolbar
+            title="选择提醒时间"
+            columns="{{ reminderOptions }}"
+            default-index="{{ reminderIndex }}"
+            bind:cancel="onCloseReminderPicker"
+            bind:confirm="onConfirmReminderPicker"
+          />
+        </van-popup>
       </view>
-      <view class="form-item">
-        <text class="label">类型</text>
-        <picker range="{{ typeOptions }}" value="{{ newAnniversary.type }}" bindchange="onTypeChange">
-          <view class="picker">{{ typeOptions[newAnniversary.type] || '请选择类型' }}</view>
-        </picker>
-      </view>
-      <view class="form-item">
-        <text class="label">重复</text>
-        <picker range="{{ repeatOptions }}" value="{{ newAnniversary.repeatType }}" bindchange="onRepeatChange">
-          <view class="picker">{{ repeatOptions[newAnniversary.repeatType] || '请选择重复类型' }}</view>
-        </picker>
-      </view>
-      <view class="form-item">
-        <text class="label">提醒</text>
-        <picker range="{{ reminderOptions }}" value="{{ reminderIndex }}" bindchange="onReminderChange">
-          <view class="picker">{{ reminderOptions[reminderIndex] }}</view>
-        </picker>
-      </view>
-      <view class="btn-group">
-        <button class="cancel-btn" bindtap="onCloseAddPopup">取消</button>
-        <button class="confirm-btn" bindtap="onConfirmAdd">确定</button>
+      <view class="popup-footer">
+        <van-button plain type="default" block bindtap="onCloseAddPopup">取消</van-button>
+        <van-button type="primary" color="#FF69B4" block bindtap="onConfirmAdd">确定</van-button>
       </view>
     </view>
   </van-popup>

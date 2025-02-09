@@ -33,20 +33,20 @@ CREATE TABLE IF NOT EXISTS `wish` (
     KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='愿望清单表';
 
--- 纪念日表
-CREATE TABLE IF NOT EXISTS `anniversary` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '纪念日ID',
-    `user_id` BIGINT NOT NULL COMMENT '用户ID',
-    `title` VARCHAR(128) NOT NULL COMMENT '纪念日标题',
-    `date` DATE NOT NULL COMMENT '纪念日日期',
-    `type` TINYINT NOT NULL DEFAULT 0 COMMENT '类型：0-恋爱纪念日，1-生日，2-其他',
-    `repeat_type` TINYINT NOT NULL DEFAULT 0 COMMENT '重复类型：0-不重复，1-每年重复',
-    `reminder_days` INT DEFAULT NULL COMMENT '提前提醒天数',
-    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    KEY `idx_user_id` (`user_id`),
-    KEY `idx_date` (`date`)
+DROP TABLE IF EXISTS anniversary;
+CREATE TABLE anniversary (
+                             id BIGINT NOT NULL AUTO_INCREMENT COMMENT '纪念日ID',
+                             user_id BIGINT NOT NULL COMMENT '用户ID',
+                             title VARCHAR(128) NOT NULL COMMENT '纪念日标题',
+                             date DATE NOT NULL COMMENT '纪念日日期',
+                             type TINYINT NOT NULL DEFAULT 0 COMMENT '类型：0-恋爱纪念日，1-生日，2-其他',
+                             repeat_type TINYINT NOT NULL DEFAULT 0 COMMENT '重复类型：0-不重复，1-每年重复',
+                             reminder_days INT DEFAULT NULL COMMENT '提前提醒天数',
+                             create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                             update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                             PRIMARY KEY (id),
+                             KEY idx_user_id (user_id),
+                             KEY idx_date (date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='纪念日表';
 
 -- 通知设置表
