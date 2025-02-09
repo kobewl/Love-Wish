@@ -144,6 +144,20 @@
   background: linear-gradient(135deg, #ff69b4, #ffb6c1);
   border-radius: 0 0 30rpx 30rpx;
   z-index: 1;
+  animation: gradientMove 8s ease infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .header {
@@ -200,13 +214,17 @@
   border-radius: 24rpx;
   padding: 30rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
   transition: all 0.3s;
-  border: 2rpx solid rgba(0, 0, 0, 0.02);
+  border: 2rpx solid rgba(255, 105, 180, 0.1);
 }
 
 .wish-card:active {
   transform: scale(0.98);
+}
+
+.wish-card:hover {
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
 }
 
 .wish-card.completed {
@@ -224,9 +242,10 @@
 
 .wish-status {
   font-size: 24rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 24rpx;
   background: rgba(255, 105, 180, 0.1);
+  backdrop-filter: blur(4px);
   color: #ff69b4;
 }
 
@@ -240,6 +259,14 @@
   color: #666;
   line-height: 1.6;
   margin: 16rpx 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  padding: 16rpx 0;
+}
+
+.wish-desc text {
+  flex: 1;
 }
 
 .wish-image {
@@ -255,6 +282,16 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .wish-footer {
@@ -269,6 +306,9 @@
 .wish-time {
   font-size: 24rpx;
   color: #999;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 
 .wish-actions {
@@ -284,10 +324,31 @@
   padding: 8rpx 12rpx;
   border-radius: 8rpx;
   transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
 }
 
 .action-btn:active {
   opacity: 0.8;
+}
+
+.action-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.action-btn:active::after {
+  width: 200rpx;
+  height: 200rpx;
+  opacity: 0;
 }
 
 .action-btn.complete {
@@ -324,11 +385,19 @@
   color: #333;
   font-weight: 500;
   margin-bottom: 12rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  justify-content: center;
 }
 
 .empty-desc {
   font-size: 28rpx;
   color: #999;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  justify-content: center;
 }
 
 .add-first-btn {
@@ -354,6 +423,7 @@
 .popup-content {
   padding: 40rpx 30rpx;
   background: #fff;
+  animation: slideUp 0.3s ease-out;
 }
 
 .popup-header {
@@ -551,10 +621,6 @@
 }
 
 /* 添加动画效果 */
-.popup-content {
-  animation: slideUp 0.3s ease-out;
-}
-
 @keyframes slideUp {
   from {
     transform: translateY(100%);
@@ -574,6 +640,9 @@
 .van-icon {
   vertical-align: middle;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .footer-btn:active .van-icon {
@@ -598,4 +667,142 @@
 
 .van-field__input {
   color: #333 !important;
+}
+
+/* 添加图标悬停效果 */
+.action-btn:hover .van-icon {
+  transform: scale(1.1);
+}
+
+/* 添加卡片阴影效果 */
+.wish-card {
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  border: 2rpx solid rgba(255, 105, 180, 0.1);
+}
+
+.wish-card:hover {
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+/* 优化状态标签 */
+.wish-status {
+  padding: 8rpx 16rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 105, 180, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.wish-status.completed {
+  background: rgba(82, 196, 26, 0.1);
+}
+
+/* 添加图片加载动画 */
+.wish-image image {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 优化按钮动画 */
+.action-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.action-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.action-btn:active::after {
+  width: 200rpx;
+  height: 200rpx;
+  opacity: 0;
+}
+
+/* 优化图标间距和对齐 */
+.van-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 添加渐变背景动画 */
+.bg-gradient {
+  animation: gradientMove 8s ease infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+
+.wish-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex: 1;
+}
+
+.wish-status {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.wish-time {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.empty-title,
+.empty-desc {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  justify-content: center;
+}
+
+.popup-title-row,
+.popup-subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
 }

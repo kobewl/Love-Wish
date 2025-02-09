@@ -58,7 +58,7 @@
         </view>
       </block>
       <view class="empty-container" wx:else>
-        <image class="empty-image" src="/images/no-data.png" mode="aspectFit"></image>
+        <image class="empty-image" src="/static/images/empty.png" mode="aspectFit"></image>
         <text class="empty-text">还没有添加纪念日哦~</text>
         <text class="empty-text">快来记录你们的第一个纪念日吧</text>
       </view>
@@ -100,11 +100,12 @@
         >
           <van-datetime-picker
             type="date"
-            value="{{ minDate }}"
+            value="{{ currentDate }}"
             min-date="{{ minDate }}"
             max-date="{{ maxDate }}"
             bind:confirm="onConfirmDatePicker"
             bind:cancel="onCloseDatePicker"
+            formatter="{{ formatter }}"
           />
         </van-popup>
         <van-field
@@ -131,10 +132,11 @@
         </van-popup>
         <van-field
           value="{{ repeatOptions[newAnniversary.repeatType] }}"
-          label="重复"
+          label="重复类型"
           placeholder="请选择重复类型"
           readonly
           bindtap="onShowRepeatPicker"
+          input-align="right"
         />
         <van-popup
           show="{{ showRepeatPicker }}"
@@ -147,8 +149,8 @@
             title="选择重复类型"
             columns="{{ repeatOptions }}"
             default-index="{{ newAnniversary.repeatType }}"
-            bind:cancel="onCancelRepeatPicker"
-            bind:confirm="onConfirmRepeatPicker"
+            bind:cancel="onCloseRepeatPicker"
+            bind:confirm="onRepeatChange"
           />
         </van-popup>
         <van-field

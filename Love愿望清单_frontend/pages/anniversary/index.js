@@ -29,7 +29,7 @@ Page({
     animationData: {},
     slideAnimation: {},
     listAnimations: [],
-    calendarFormatter: null
+    formatter: null
   },
 
   onLoad() {
@@ -49,7 +49,27 @@ Page({
 
     // 设置日历formatter
     this.setData({
-      calendarFormatter: this.formatter.bind(this)
+      formatter: (day) => {
+        if (!day || !this.data.anniversaryList) return day
+        const date = dayjs(day.date).format('YYYY-MM-DD')
+        const matched = this.data.anniversaryList.find(item => {
+          if (!item || !item.date) return false
+          if (item.repeatType === 0) {
+            return item.date === date
+          } else {
+            return dayjs(item.date).format('MM-DD') === dayjs(date).format('MM-DD')
+          }
+        })
+        
+        if (matched) {
+          return {
+            ...day,
+            bottomInfo: matched.title.substring(0, 6) + '...',
+            className: 'anniversary-day'
+          }
+        }
+        return day
+      }
     }, () => {
       // 在设置完formatter后再获取纪念日列表
       this.getAnniversaryList()
@@ -89,43 +109,55 @@ Page({
 
   // 获取纪念日列表
   async getAnniversaryList() {
-    this.setData({ loading: true, anniversaryList: [] })
+    this.setData({ loading: true })
     try {
-      const res = await wx.request({
-        url: `${app.globalData.baseUrl}/api/anniversary/my`,
-        method: 'GET',
-        header: {
-          'Authorization': `Bearer ${wx.getStorageSync('token')}`,
-          'Content-Type': 'application/json'
-        }
+      const token = wx.getStorageSync('token')
+      if (!token) {
+        throw new Error('未登录')
+      }
+
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${app.globalData.baseUrl}/api/anniversary/my`,
+          method: 'GET',
+          header: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          success: resolve,
+          fail: reject
+        })
       })
 
-      if (res.statusCode === 200 && res.data.code === 0) {
+      if (res.statusCode === 200 && res.data && res.data.code === 0) {
         const records = res.data.data.records || []
-        const processedList = records.map(item => ({
+        // 限制数据大小，每次最多加载50条记录
+        const processedList = records.slice(0, 50).map(item => ({
           id: item.id,
-          title: item.title.substring(0, 20), // 限制标题长度
+          title: item.title,
           date: item.date,
-          type: item.type || 0,
-          repeatType: item.repeatType || 0,
-          reminderDays: item.reminderDays || 7,
-          daysUntil: this.calculateDaysUntil(item.date, item.repeatType || 0)
+          type: parseInt(item.type) || 0,
+          repeatType: parseInt(item.repeatType) || 0,
+          reminderDays: parseInt(item.reminderDays) || 7,
+          daysUntil: this.calculateDaysUntil(item.date, parseInt(item.repeatType) || 0)
         }))
 
-        // 分批次设置数据
-        const batchSize = 5
-        for (let i = 0; i < processedList.length; i += batchSize) {
-          const batch = processedList.slice(i, i + batchSize)
-          await new Promise(resolve => {
-            this.setData({
-              anniversaryList: this.data.anniversaryList.concat(batch)
-            }, resolve)
-          })
-        }
+        this.setData({
+          anniversaryList: processedList
+        }, () => {
+          // 执行列表动画
+          this.executeListAnimation()
+        })
+      } else {
+        throw new Error(res.data?.message || '获取纪念日列表失败')
       }
     } catch (err) {
       console.error('获取纪念日列表失败:', err)
-      app.showError('网络请求失败')
+      wx.showToast({
+        title: err.message || '网络请求失败',
+        icon: 'none',
+        duration: 2000
+      })
     } finally {
       this.setData({ loading: false })
     }
@@ -204,9 +236,13 @@ Page({
 
   // 输入标题
   onTitleInput(e) {
+    const value = e.detail && (e.detail.value || e.detail);
+    if (value === undefined || value === null) return;
+    
+    const title = String(value).trim();
     this.setData({
-      'newAnniversary.title': e.detail.value
-    })
+      'newAnniversary.title': title
+    });
   },
 
   // 选择日期
@@ -223,11 +259,27 @@ Page({
     })
   },
 
+  // 显示重复类型选择器
+  onShowRepeatPicker() {
+    this.setData({
+      showRepeatPicker: true
+    });
+  },
+
+  // 关闭重复类型选择器
+  onCloseRepeatPicker() {
+    this.setData({
+      showRepeatPicker: false
+    });
+  },
+
   // 选择重复类型
   onRepeatChange(e) {
+    const { value, index } = e.detail;
     this.setData({
-      'newAnniversary.repeatType': parseInt(e.detail.value)
-    })
+      'newAnniversary.repeatType': index,
+      showRepeatPicker: false
+    });
   },
 
   // 选择提醒时间
@@ -246,19 +298,34 @@ Page({
 
   // 确认添加
   async onConfirmAdd() {
-    const { title, date } = this.data.newAnniversary
-    if (!title) {
-      app.showError('请输入标题')
-      return
-    }
-    if (!date) {
-      app.showError('请选择日期')
+    const { title, date, type, repeatType, reminderDays } = this.data.newAnniversary
+    
+    // 验证标题
+    if (!title || title.trim() === '') {
+      wx.showToast({
+        title: '请输入标题',
+        icon: 'none',
+        duration: 2000
+      })
       return
     }
 
-    app.showLoading('添加中...')
+    wx.showLoading({
+      title: '添加中...',
+      mask: true
+    })
 
     try {
+      const requestData = {
+        title: title.trim(),
+        date: date,
+        type: parseInt(type),
+        repeatType: parseInt(repeatType),
+        reminderDays: parseInt(reminderDays)
+      }
+
+      console.log('提交的数据:', requestData)
+
       const res = await wx.request({
         url: `${app.globalData.baseUrl}/api/anniversary`,
         method: 'POST',
@@ -266,24 +333,36 @@ Page({
           'Authorization': `Bearer ${wx.getStorageSync('token')}`,
           'Content-Type': 'application/json'
         },
-        data: this.data.newAnniversary
+        data: requestData
       })
 
-      if (res.statusCode === 200 && res.data.code === 0) {
-        app.showSuccess('添加成功')
+      console.log('添加纪念日响应:', res)
+
+      if (res.statusCode === 200 && res.data && res.data.code === 0) {
+        wx.showToast({
+          title: '添加成功',
+          icon: 'success',
+          duration: 2000
+        })
         this.setData({
           showAddPopup: false
         })
-        // 重新加载列表并执行动画
-        this.getAnniversaryList()
+        // 重新加载列表
+        setTimeout(() => {
+          this.getAnniversaryList()
+        }, 1000)
       } else {
-        app.showError(res.data?.message || '添加失败')
+        throw new Error(res.data?.message || '添加失败')
       }
     } catch (err) {
       console.error('添加纪念日失败:', err)
-      app.showError('网络请求失败')
+      wx.showToast({
+        title: err.message || '网络请求失败',
+        icon: 'none',
+        duration: 2000
+      })
     } finally {
-      app.hideLoading()
+      wx.hideLoading()
     }
   },
 
@@ -351,61 +430,16 @@ Page({
     })
   },
 
-  // 日历格式化函数
-  formatter(day) {
-    if (!day || !this.data.anniversaryList) return day
-    const date = dayjs(day.date).format('YYYY-MM-DD')
-    const matched = this.data.anniversaryList.find(item => {
-      if (!item || !item.date) return false
-      if (item.repeatType === 0) {
-        return item.date === date
-      } else {
-        return dayjs(item.date).format('MM-DD') === dayjs(date).format('MM-DD')
-      }
-    })
-    
-    if (matched) {
-      return {
-        ...day,
-        bottomInfo: matched.title.substring(0, 6) + '...',
-        className: 'anniversary-day'
-      }
-    }
-    return day
-  },
-
-  // 显示重复类型选择器
-  onShowRepeatPicker() {
-    this.setData({
-      showRepeatPicker: true
-    })
-  },
-
-  // 关闭重复类型选择器
-  onCloseRepeatPicker() {
-    this.setData({
-      showRepeatPicker: false
-    })
-  },
-
-  // 确认重复类型选择
-  onConfirmRepeatPicker(e) {
-    this.setData({
-      'newAnniversary.repeatType': parseInt(e.detail.value),
-      showRepeatPicker: false
-    })
-  },
-
-  // 取消重复类型选择
-  onCancelRepeatPicker() {
-    this.setData({
-      showRepeatPicker: false
-    })
-  },
-
   // 显示日期选择器
   onShowDatePicker() {
-    this.setData({ showDatePicker: true })
+    const currentDate = this.data.newAnniversary.date ? 
+      new Date(this.data.newAnniversary.date).getTime() : 
+      new Date().getTime();
+      
+    this.setData({ 
+      showDatePicker: true,
+      currentDate: currentDate
+    });
   },
 
   // 关闭日期选择器
@@ -415,10 +449,14 @@ Page({
 
   // 确认日期选择
   onConfirmDatePicker(e) {
+    const selectedDate = new Date(e.detail);
+    const formattedDate = dayjs(selectedDate).format('YYYY-MM-DD');
+    console.log('选择的日期:', formattedDate);
+    
     this.setData({
-      'newAnniversary.date': dayjs(e.detail).format('YYYY-MM-DD'),
+      'newAnniversary.date': formattedDate,
       showDatePicker: false
-    })
+    });
   },
 
   // 显示类型选择器

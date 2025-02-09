@@ -1,12 +1,20 @@
 <view class="wish-container">
   <!-- 顶部背景 -->
-  <view class="bg-gradient"></view>
+  <view class="bg-gradient">
+    <view class="bg-pattern"></view>
+  </view>
 
   <!-- 头部区域 -->
   <view class="header">
     <view class="title-section">
-      <text class="main-title">愿望清单</text>
-      <text class="sub-title">记录美好，实现梦想</text>
+      <view class="title-row">
+        <van-icon name="star" size="48rpx" color="#fff" />
+        <text class="main-title">愿望清单</text>
+      </view>
+      <view class="subtitle-row">
+        <van-icon name="smile" size="32rpx" color="rgba(255,255,255,0.8)" />
+        <text class="sub-title">记录美好，实现梦想</text>
+      </view>
     </view>
     <view class="add-btn-wrapper">
       <view class="add-btn" bindtap="showAddPopup">
@@ -30,17 +38,27 @@
       >
         <view class="wish-content">
           <view class="wish-header">
-            <view class="wish-title">{{ item.title }}</view>
+            <view class="wish-title-wrapper">
+              <van-icon name="gift-o" color="#FF69B4" size="36rpx" />
+              <view class="wish-title">{{ item.title }}</view>
+            </view>
             <view class="wish-status {{ item.status === 1 ? 'completed' : '' }}">
-              {{ item.status === 1 ? '已完成' : '进行中' }}
+              <van-icon name="{{ item.status === 1 ? 'checked' : 'clock' }}" size="24rpx" />
+              <text>{{ item.status === 1 ? '已完成' : '进行中' }}</text>
             </view>
           </view>
-          <view class="wish-desc" wx:if="{{ item.description }}">{{ item.description }}</view>
+          <view class="wish-desc" wx:if="{{ item.description }}">
+            <van-icon name="description" color="#999" size="28rpx" />
+            <text>{{ item.description }}</text>
+          </view>
           <view class="wish-image" wx:if="{{ item.imageUrl }}">
             <image src="{{ item.imageUrl }}" mode="aspectFill"></image>
           </view>
           <view class="wish-footer">
-            <view class="wish-time">{{ item.createTime }}</view>
+            <view class="wish-time">
+              <van-icon name="clock" color="#999" size="24rpx" />
+              <text>{{ item.createTime }}</text>
+            </view>
             <view class="wish-actions">
               <view class="action-btn complete" catchtap="toggleWishStatus" data-id="{{ item.id }}" data-status="{{ item.status }}">
                 <van-icon name="{{ item.status === 1 ? 'success' : 'circle' }}" />
@@ -62,11 +80,17 @@
     <view class="empty-container" wx:else>
       <image class="empty-image" src="/static/images/empty.png" mode="aspectFit"></image>
       <view class="empty-text">
-        <text class="empty-title">还没有愿望清单~</text>
-        <text class="empty-desc">点击右上角的"+"添加你的第一个愿望吧</text>
+        <view class="empty-title">
+          <van-icon name="smile-o" color="#FF69B4" size="40rpx" />
+          <text>还没有愿望清单~</text>
+        </view>
+        <view class="empty-desc">
+          <van-icon name="add" color="#999" size="28rpx" />
+          <text>点击右上角的"+"添加你的第一个愿望吧</text>
+        </view>
       </view>
       <view class="add-first-btn" bindtap="showAddPopup">
-        <van-icon name="plus" />
+        <van-icon name="plus" size="32rpx" />
         <text>添加愿望</text>
       </view>
     </view>
@@ -83,8 +107,14 @@
     <view class="popup-content">
       <view class="popup-header">
         <view class="popup-title-section">
-          <text class="popup-title">{{ editingWish ? '编辑愿望' : '添加愿望' }}</text>
-          <text class="popup-subtitle">记录下你的美好愿望吧</text>
+          <view class="popup-title-row">
+            <van-icon name="{{ editingWish ? 'edit' : 'plus' }}" color="#FF69B4" size="44rpx" />
+            <text class="popup-title">{{ editingWish ? '编辑愿望' : '添加愿望' }}</text>
+          </view>
+          <view class="popup-subtitle-row">
+            <van-icon name="smile-o" color="#999" size="28rpx" />
+            <text class="popup-subtitle">记录下你的美好愿望吧</text>
+          </view>
         </view>
         <view class="popup-close" bindtap="onCloseAddPopup">
           <van-icon name="cross" size="44rpx" color="#999" />
