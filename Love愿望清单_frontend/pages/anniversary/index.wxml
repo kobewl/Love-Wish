@@ -37,8 +37,9 @@
           class="anniversary-item" 
           wx:for="{{ anniversaryList }}" 
           wx:key="id" 
-          bindtap="showDetailPopup" 
+          catchtap="showDetailPopup" 
           data-item="{{ item }}"
+          hover-class="item-hover"
         >
           <view class="item-left">
             <view class="item-type" style="background: {{ item.type === 0 ? '#FF69B4' : item.type === 1 ? '#FFB6C1' : '#FFC0CB' }}">

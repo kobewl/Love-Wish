@@ -220,9 +220,24 @@ Page({
   // 显示详情弹窗
   showDetailPopup(e) {
     const item = e.currentTarget.dataset.item
+    if (!item) {
+      wx.showToast({
+        title: '数据异常',
+        icon: 'none'
+      })
+      return
+    }
+
+    // 计算最新的倒计时天数
+    const daysUntil = this.calculateDaysUntil(item.date, item.repeatType)
+    const currentAnniversary = {
+      ...item,
+      daysUntil
+    }
+
     this.setData({
       showDetailPopup: true,
-      currentAnniversary: item
+      currentAnniversary
     })
   },
 
@@ -231,6 +246,9 @@ Page({
     this.setData({
       showDetailPopup: false,
       currentAnniversary: null
+    }, () => {
+      // 关闭后重新获取列表，确保数据最新
+      this.getAnniversaryList()
     })
   },
 

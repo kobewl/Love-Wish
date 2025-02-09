@@ -48,8 +48,8 @@ page {
   width: 100%;
   padding: 16px;
   box-sizing: border-box;
-  border-top: .5px solid rgba(0, 0, 0, 0.1);
-  border-bottom: .5px solid rgba(0, 0, 0, 0.1);
+  border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
   color: black;
 }
 
@@ -62,9 +62,196 @@ page {
 }
 
 .index-container {
-  padding: 24rpx;
   min-height: 100vh;
-  background: var(--bg-color);
+  background: #f8f8f8;
+  padding: 24rpx;
+  padding-top: 0;
+}
+
+.bg-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 400rpx;
+  background: linear-gradient(135deg, #ff69b4, #ffb6c1);
+  z-index: 1;
+}
+
+.bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.1;
+  background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+/* 卡片通用样式 */
+.love-words-card,
+.anniversary-card,
+.wish-progress-card {
+  position: relative;
+  z-index: 2;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.card-header .title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-header .subtitle {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.card-header .more {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.card-header .more text {
+  margin-right: 8rpx;
+}
+
+/* 情话卡片样式 */
+.love-words-card {
+  margin-top: 120rpx;
+}
+
+.love-words-content {
+  padding: 24rpx;
+  background: #fff9fb;
+  border-radius: 16rpx;
+}
+
+.love-words {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 纪念日列表样式 */
+.anniversary-list {
+  margin-top: 24rpx;
+}
+
+.anniversary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  background: #fff9fb;
+  border-radius: 16rpx;
+  transition: all 0.3s;
+}
+
+.anniversary-item:active {
+  transform: scale(0.98);
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.item-type {
+  padding: 4rpx 16rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  color: #fff;
+  margin-right: 16rpx;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-title {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.item-date {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.days-count {
+  font-size: 28rpx;
+  color: #ff69b4;
+  font-weight: 500;
+}
+
+.days-count.today {
+  color: #52c41a;
+}
+
+.days-count.passed {
+  color: #999;
+}
+
+.empty-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.empty-tip text {
+  margin-top: 16rpx;
+}
+
+/* 愿望进度样式 */
+.progress-content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24rpx;
+  padding: 24rpx;
+  background: #fff9fb;
+  border-radius: 16rpx;
+}
+
+.progress-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.progress-item .label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 12rpx;
+}
+
+.progress-item .value {
+  font-size: 36rpx;
+  color: #ff69b4;
+  font-weight: 600;
 }
 
 /* 情侣卡片 */
@@ -128,10 +315,6 @@ page {
   margin-top: 24rpx;
 }
 
-.card-header {
-  margin-bottom: 24rpx;
-}
-
 .from {
   font-size: 24rpx;
   color: var(--desc-color);
@@ -168,11 +351,11 @@ page {
 }
 
 .type-icon.LOVE {
-  background-image: url('data:image/png;base64,...'); /* 需要替换为实际图标 */
+  background-image: url("data:image/png;base64,..."); /* 需要替换为实际图标 */
 }
 
 .type-icon.BIRTHDAY {
-  background-image: url('data:image/png;base64,...'); /* 需要替换为实际图标 */
+  background-image: url("data:image/png;base64,..."); /* 需要替换为实际图标 */
 }
 
 .info .name {

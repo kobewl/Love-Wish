@@ -1,6 +1,7 @@
 package com.lovewish.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.lovewish.model.Anniversary;
 
 import java.time.LocalDate;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * 纪念日服务接口
  */
-public interface AnniversaryService {
+public interface AnniversaryService extends IService<Anniversary> {
     /**
      * 创建纪念日
      */

@@ -1,6 +1,7 @@
 // index.js
 const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
 const app = getApp()
+const dayjs = require('dayjs')
 
 Page({
   data: {
@@ -25,6 +26,12 @@ Page({
     hasUserInfo: false,
     canIUseGetUserProfile: wx.canIUse('getUserProfile'),
     canIUseNicknameComp: wx.canIUse('input.type.nickname'),
+    todayLoveWords: '',
+    wishStats: {
+      completed: 0,
+      ongoing: 0,
+      completionRate: '0%'
+    }
   },
   bindViewTap() {
     wx.navigateTo({
@@ -61,17 +68,12 @@ Page({
     })
   },
   onLoad() {
-    this.checkLoginStatus()
-    this.getRelationInfo()
-    this.getRecentAnniversaries()
-    this.getWishProgress()
-    this.getDailyLove()
+    if (!app.checkLoginStatus()) return
+    this.loadPageData()
   },
   onShow() {
-    if (wx.getStorageSync('token')) {
-      this.getUserInfo()
-      this.getRelationInfo()
-    }
+    if (!app.checkLoginStatus()) return
+    this.loadPageData()
   },
   checkLoginStatus() {
     const token = wx.getStorageSync('token')
@@ -128,24 +130,31 @@ Page({
   },
   async getRecentAnniversaries() {
     try {
-      // TODO: 调用后端API
-      const recentAnniversaries = [
-        {
-          id: 1,
-          title: '恋爱纪念日',
-          date: '2024-04-01',
-          daysLeft: 7,
-          type: 'LOVE'
-        },
-        {
-          id: 2, 
-          title: '生日',
-          date: '2024-04-15',
-          daysLeft: 21,
-          type: 'BIRTHDAY'
+      const token = wx.getStorageSync('token')
+      if (!token) throw new Error('未登录')
+
+      const res = await wx.request({
+        url: `${app.globalData.baseUrl}/api/anniversary/recent`,
+        method: 'GET',
+        header: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      ]
-      this.setData({ recentAnniversaries })
+      })
+
+      if (res.statusCode === 200 && res.data && res.data.code === 0) {
+        const records = res.data.data || []
+        const processedList = records.map(item => ({
+          id: item.id,
+          title: item.title,
+          date: item.date,
+          type: parseInt(item.type) || 0,
+          repeatType: parseInt(item.repeatType) || 0,
+          daysUntil: this.calculateDaysUntil(item.date, parseInt(item.repeatType) || 0)
+        }))
+
+        this.setData({ recentAnniversaries: processedList })
+      }
     } catch (err) {
       console.error('获取近期纪念日失败:', err)
     }
@@ -184,6 +193,105 @@ Page({
     const { id } = e.currentTarget.dataset
     wx.navigateTo({
       url: `/pages/anniversary/detail/index?id=${id}`
+    })
+  },
+  // 加载页面数据
+  async loadPageData() {
+    Promise.all([
+      this.getRecentAnniversaries(),
+      this.getWishStats(),
+      this.getTodayLoveWords()
+    ]).catch(err => {
+      console.error('加载页面数据失败:', err)
+    })
+  },
+  // 获取愿望统计
+  async getWishStats() {
+    try {
+      const token = wx.getStorageSync('token')
+      if (!token) throw new Error('未登录')
+
+      const res = await wx.request({
+        url: `${app.globalData.baseUrl}/api/wish/stats`,
+        method: 'GET',
+        header: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (res.statusCode === 200 && res.data && res.data.code === 0) {
+        const stats = res.data.data || {}
+        const total = (stats.completed || 0) + (stats.ongoing || 0)
+        const completionRate = total > 0 
+          ? Math.round((stats.completed || 0) / total * 100) + '%' 
+          : '0%'
+
+        this.setData({
+          wishStats: {
+            completed: stats.completed || 0,
+            ongoing: stats.ongoing || 0,
+            completionRate
+          }
+        })
+      }
+    } catch (err) {
+      console.error('获取愿望统计失败:', err)
+    }
+  },
+  // 获取今日情话
+  async getTodayLoveWords() {
+    try {
+      const token = wx.getStorageSync('token')
+      if (!token) throw new Error('未登录')
+
+      const res = await wx.request({
+        url: `${app.globalData.baseUrl}/api/love-words/today`,
+        method: 'GET',
+        header: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (res.statusCode === 200 && res.data && res.data.code === 0) {
+        this.setData({
+          todayLoveWords: res.data.data?.content || ''
+        })
+      }
+    } catch (err) {
+      console.error('获取今日情话失败:', err)
+    }
+  },
+  // 计算距离纪念日的天数
+  calculateDaysUntil(date, repeatType) {
+    const today = dayjs()
+    let targetDate = dayjs(date)
+
+    if (repeatType === 1) {
+      // 每年重复的情况
+      const thisYear = today.format('YYYY')
+      const dateThisYear = dayjs(`${thisYear}-${targetDate.format('MM-DD')}`)
+      
+      if (dateThisYear.isBefore(today)) {
+        // 如果今年的日期已过，则计算到明年的日期
+        targetDate = dayjs(`${parseInt(thisYear) + 1}-${targetDate.format('MM-DD')}`)
+      } else {
+        targetDate = dateThisYear
+      }
+    }
+
+    return targetDate.diff(today, 'day')
+  },
+  // 页面跳转
+  navigateToAnniversary() {
+    wx.switchTab({
+      url: '/pages/anniversary/index'
+    })
+  },
+  navigateToWish() {
+    wx.switchTab({
+      url: '/pages/wish/index'
     })
   }
 })

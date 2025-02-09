@@ -27,94 +27,78 @@
 </scroll-view>
 
 <view class="index-container">
-  <!-- 顶部情侣信息卡片 -->
-  <view class="couple-card card">
-    <block wx:if="{{relationInfo.status === 'ACTIVE'}}">
-      <view class="couple-info flex items-center justify-between">
-        <view class="user-avatar-box">
-          <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"/>
-          <text class="nickname">{{userInfo.nickName}}</text>
-        </view>
-        <view class="love-days flex-col items-center">
-          <text class="days">{{relationInfo.days}}</text>
-          <text class="label">相恋天数</text>
-        </view>
-        <view class="user-avatar-box">
-          <image class="avatar" src="{{partnerInfo.avatarUrl}}" mode="aspectFill"/>
-          <text class="nickname">{{partnerInfo.nickName}}</text>
-        </view>
-      </view>
-    </block>
-    <block wx:else>
-      <view class="no-match flex-col items-center">
-        <image class="empty-img" src="/assets/images/no-match.png" mode="aspectFit"/>
-        <text class="tips">还没有匹配到另一半哦</text>
-        <button class="btn" bindtap="goToMatch">去匹配</button>
-      </view>
-    </block>
+  <!-- 顶部背景 -->
+  <view class="bg-gradient">
+    <view class="bg-pattern"></view>
   </view>
 
-  <!-- 每日情话卡片 -->
-  <view class="love-card card">
-    <view class="card-header flex justify-between items-center">
+  <!-- 今日情话 -->
+  <view class="love-words-card">
+    <view class="card-header">
       <text class="title">今日情话</text>
-      <text class="from">{{dailyLove.from}}</text>
+      <text class="subtitle">精选集</text>
     </view>
-    <view class="love-content">{{dailyLove.content}}</view>
+    <view class="love-words-content">
+      <text class="love-words">{{ todayLoveWords || '你是我温暖的日光，可爱的月亮，全部的星辰。' }}</text>
+    </view>
   </view>
 
   <!-- 近期纪念日 -->
-  <view class="anniversary-card card">
-    <view class="card-header flex justify-between items-center">
+  <view class="anniversary-card">
+    <view class="card-header">
       <text class="title">近期纪念日</text>
-      <navigator url="/pages/anniversary/index" class="more">
-        查看全部
+      <view class="more" bindtap="navigateToAnniversary">
+        <text>查看全部</text>
         <van-icon name="arrow" />
-      </navigator>
+      </view>
     </view>
     <view class="anniversary-list">
-      <view 
-        class="anniversary-item flex justify-between items-center"
-        wx:for="{{recentAnniversaries}}"
-        wx:key="id"
-        data-id="{{item.id}}"
-        bindtap="goToAnniversaryDetail"
-      >
-        <view class="flex items-center">
-          <view class="type-icon {{item.type}}"></view>
-          <view class="info">
-            <view class="name">{{item.title}}</view>
-            <view class="date">{{item.date}}</view>
+      <block wx:if="{{ recentAnniversaries && recentAnniversaries.length > 0 }}">
+        <view class="anniversary-item" wx:for="{{ recentAnniversaries }}" wx:key="id">
+          <view class="item-left">
+            <view class="item-type" style="background: {{ item.type === 0 ? '#FF69B4' : item.type === 1 ? '#FFB6C1' : '#FFC0CB' }}">
+              {{ item.type === 0 ? '恋爱' : item.type === 1 ? '生日' : '其他' }}
+            </view>
+            <view class="item-info">
+              <text class="item-title">{{ item.title }}</text>
+              <text class="item-date">{{ item.date }}</text>
+            </view>
+          </view>
+          <view class="item-right">
+            <text class="days-count" wx:if="{{ item.daysUntil > 0 }}">{{ item.daysUntil }}天</text>
+            <text class="days-count today" wx:elif="{{ item.daysUntil === 0 }}">Today</text>
+            <text class="days-count passed" wx:else>{{ -item.daysUntil }}天前</text>
           </view>
         </view>
-        <view class="days-left">
-          <text class="num">{{item.daysLeft}}</text>
-          <text class="unit">天</text>
-        </view>
+      </block>
+      <view class="empty-tip" wx:else>
+        <van-icon name="calendar-o" size="48rpx" color="#999" />
+        <text>暂无近期纪念日</text>
       </view>
     </view>
   </view>
 
   <!-- 愿望进度 -->
-  <view class="wish-card card">
-    <view class="card-header flex justify-between items-center">
+  <view class="wish-progress-card">
+    <view class="card-header">
       <text class="title">愿望进度</text>
-      <navigator url="/pages/wish/index" class="more">
-        查看全部
+      <view class="more" bindtap="navigateToWish">
+        <text>查看全部</text>
         <van-icon name="arrow" />
-      </navigator>
+      </view>
     </view>
-    <view class="progress-box">
-      <view class="progress-info flex justify-between">
-        <text>完成进度</text>
-        <text>{{wishProgress.rate}}</text>
+    <view class="progress-content">
+      <view class="progress-item">
+        <text class="label">已完成愿望</text>
+        <text class="value">{{ wishStats.completed || 0 }}</text>
       </view>
-      <view class="progress-bar">
-        <view class="progress" style="width:{{wishProgress.rate}}"></view>
+      <view class="progress-item">
+        <text class="label">进行中</text>
+        <text class="value">{{ wishStats.ongoing || 0 }}</text>
       </view>
-      <view class="progress-detail flex justify-between">
-        <text>已完成 {{wishProgress.completed}}</text>
-        <text>总计 {{wishProgress.total}}</text>
+      <view class="progress-item">
+        <text class="label">完成率</text>
+        <text class="value">{{ wishStats.completionRate || '0%' }}</text>
       </view>
     </view>
   </view>

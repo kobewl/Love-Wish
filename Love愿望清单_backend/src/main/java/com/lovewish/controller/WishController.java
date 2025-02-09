@@ -1,5 +1,6 @@
 package com.lovewish.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lovewish.common.Result;
 import com.lovewish.model.Wish;
@@ -10,6 +11,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 愿望控制器
@@ -123,6 +127,33 @@ public class WishController {
         } catch (Exception e) {
             log.error("获取配对用户的愿望列表失败", e);
             return Result.error("获取配对用户的愿望列表失败：" + e.getMessage());
+        }
+    }
+
+    @ApiOperation("获取愿望统计")
+    @GetMapping("/stats")
+    public Result<Map<String, Integer>> getWishStats() {
+        try {
+            Long userId = userService.getCurrentUserId();
+            Map<String, Integer> stats = new HashMap<>();
+
+            // 获取已完成的愿望数量
+            LambdaQueryWrapper<Wish> completedQuery = new LambdaQueryWrapper<>();
+            completedQuery.eq(Wish::getUserId, userId).eq(Wish::getStatus, 1);
+            int completed = (int) wishService.count(completedQuery);
+
+            // 获取进行中的愿望数量
+            LambdaQueryWrapper<Wish> ongoingQuery = new LambdaQueryWrapper<>();
+            ongoingQuery.eq(Wish::getUserId, userId).eq(Wish::getStatus, 0);
+            int ongoing = (int) wishService.count(ongoingQuery);
+
+            stats.put("completed", completed);
+            stats.put("ongoing", ongoing);
+
+            return Result.success(stats);
+        } catch (Exception e) {
+            log.error("获取愿望统计失败", e);
+            return Result.error("获取愿望统计失败：" + e.getMessage());
         }
     }
 }

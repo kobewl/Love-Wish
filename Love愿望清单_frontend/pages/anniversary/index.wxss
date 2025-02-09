@@ -141,7 +141,8 @@
   transition: all 0.3s;
 }
 
-.anniversary-item:active {
+.item-hover {
+  background: #f8f8f8;
   transform: scale(0.98);
 }
 

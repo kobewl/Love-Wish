@@ -1,10 +1,13 @@
 package com.lovewish.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lovewish.common.Result;
 import com.lovewish.model.Anniversary;
 import com.lovewish.service.AnniversaryService;
 import com.lovewish.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,6 +22,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/anniversary")
+@Api(tags = "纪念日管理")
 public class AnniversaryController {
 
     @Autowired
@@ -125,6 +129,26 @@ public class AnniversaryController {
         } catch (Exception e) {
             log.error("获取最近的纪念日失败", e);
             return Result.error("获取最近的纪念日失败：" + e.getMessage());
+        }
+    }
+
+    @ApiOperation("获取近期纪念日")
+    @GetMapping("/recent")
+    public Result<List<Anniversary>> getRecentAnniversaries() {
+        try {
+            Long userId = userService.getCurrentUserId();
+
+            // 获取最近30天内的纪念日
+            LambdaQueryWrapper<Anniversary> query = new LambdaQueryWrapper<>();
+            query.eq(Anniversary::getUserId, userId)
+                    .orderByAsc(Anniversary::getDate)
+                    .last("LIMIT 5"); // 只返回最近的5个纪念日
+
+            List<Anniversary> anniversaries = anniversaryService.list(query);
+            return Result.success(anniversaries);
+        } catch (Exception e) {
+            log.error("获取近期纪念日失败", e);
+            return Result.error("获取近期纪念日失败：" + e.getMessage());
         }
     }
 }
