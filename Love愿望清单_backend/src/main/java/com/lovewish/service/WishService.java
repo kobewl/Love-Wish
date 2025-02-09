@@ -1,16 +1,22 @@
 package com.lovewish.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.lovewish.model.Wish;
 
 /**
  * 愿望服务接口
  */
-public interface WishService {
+public interface WishService extends IService<Wish> {
     /**
-     * 创建愿望
+     * 添加愿望
      */
-    Wish createWish(Wish wish);
+    Wish addWish(Wish wish);
+
+    /**
+     * 获取我的愿望列表
+     */
+    IPage<Wish> getMyWishList(Long userId, Integer status, Integer pageNum, Integer pageSize);
 
     /**
      * 更新愿望
@@ -18,9 +24,14 @@ public interface WishService {
     Wish updateWish(Wish wish);
 
     /**
+     * 更新愿望状态
+     */
+    Boolean updateWishStatus(Long id, Integer status);
+
+    /**
      * 删除愿望
      */
-    void deleteWish(Long wishId);
+    Boolean deleteWish(Long id);
 
     /**
      * 完成愿望

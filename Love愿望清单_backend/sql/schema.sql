@@ -1,7 +1,7 @@
 -- 创建数据库
-CREATE DATABASE IF NOT EXISTS love_wish DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS love_wish_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE love_wish;
+USE love_wish_db;
 
 -- 用户表
 CREATE TABLE IF NOT EXISTS `user` (
@@ -20,18 +20,18 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 -- 愿望清单表
 CREATE TABLE IF NOT EXISTS `wish` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '愿望ID',
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `user_id` BIGINT NOT NULL COMMENT '用户ID',
-    `title` VARCHAR(128) NOT NULL COMMENT '愿望标题',
-    `description` TEXT DEFAULT NULL COMMENT '愿望描述',
-    `image_url` VARCHAR(255) DEFAULT NULL COMMENT '愿望图片URL',
+    `title` VARCHAR(100) NOT NULL COMMENT '愿望标题',
+    `description` TEXT COMMENT '愿望描述',
+    `image_url` VARCHAR(255) DEFAULT NULL COMMENT '图片URL',
     `status` TINYINT NOT NULL DEFAULT 0 COMMENT '状态：0-未完成，1-已完成',
     `complete_time` DATETIME DEFAULT NULL COMMENT '完成时间',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY `idx_user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='愿望清单表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='愿望表';
 
 DROP TABLE IF EXISTS anniversary;
 CREATE TABLE anniversary (

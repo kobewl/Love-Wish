@@ -1,6 +1,6 @@
 package com.lovewish.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -25,34 +25,50 @@ public class WishServiceImpl extends ServiceImpl<WishMapper, Wish> implements Wi
     private UserService userService;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Wish createWish(Wish wish) {
-        // 设置用户ID
-        wish.setUserId(userService.getCurrentUserId());
-        // 设置初始状态
-        wish.setStatus(0);
-        // 保存愿望
-        this.save(wish);
+    @Transactional
+    public Wish addWish(Wish wish) {
+        Long userId = userService.getCurrentUserId();
+        wish.setUserId(userId);
+        wish.setStatus(0); // 0: 未完成
+        wish.setCreateTime(LocalDateTime.now());
+        wish.setUpdateTime(LocalDateTime.now());
+        save(wish);
         return wish;
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Wish updateWish(Wish wish) {
-        // 检查权限
-        checkWishPermission(wish.getId());
-        // 更新愿望
-        this.updateById(wish);
-        return this.getById(wish.getId());
+    public IPage<Wish> getMyWishList(Long userId, Integer status, Integer pageNum, Integer pageSize) {
+        LambdaQueryWrapper<Wish> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Wish::getUserId, userId);
+        if (status != null) {
+            wrapper.eq(Wish::getStatus, status);
+        }
+        wrapper.orderByDesc(Wish::getCreateTime);
+        return page(new Page<>(pageNum, pageSize), wrapper);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteWish(Long wishId) {
-        // 检查权限
-        checkWishPermission(wishId);
-        // 删除愿望
-        this.removeById(wishId);
+    @Transactional
+    public Wish updateWish(Wish wish) {
+        wish.setUpdateTime(LocalDateTime.now());
+        updateById(wish);
+        return wish;
+    }
+
+    @Override
+    @Transactional
+    public Boolean updateWishStatus(Long id, Integer status) {
+        Wish wish = new Wish();
+        wish.setId(id);
+        wish.setStatus(status);
+        wish.setUpdateTime(LocalDateTime.now());
+        return updateById(wish);
+    }
+
+    @Override
+    @Transactional
+    public Boolean deleteWish(Long id) {
+        return removeById(id);
     }
 
     @Override
@@ -82,12 +98,12 @@ public class WishServiceImpl extends ServiceImpl<WishMapper, Wish> implements Wi
     @Override
     public IPage<Wish> getWishList(Long userId, Integer status, int pageNum, int pageSize) {
         // 构建查询条件
-        QueryWrapper<Wish> queryWrapper = new QueryWrapper<Wish>()
-                .eq("user_id", userId);
+        LambdaQueryWrapper<Wish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Wish::getUserId, userId);
         if (status != null) {
-            queryWrapper.eq("status", status);
+            queryWrapper.eq(Wish::getStatus, status);
         }
-        queryWrapper.orderByDesc("create_time");
+        queryWrapper.orderByDesc(Wish::getCreateTime);
 
         // 分页查询
         return this.page(new Page<>(pageNum, pageSize), queryWrapper);
@@ -102,12 +118,12 @@ public class WishServiceImpl extends ServiceImpl<WishMapper, Wish> implements Wi
         }
 
         // 构建查询条件
-        QueryWrapper<Wish> queryWrapper = new QueryWrapper<Wish>()
-                .eq("user_id", currentUser.getPairedUserId());
+        LambdaQueryWrapper<Wish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Wish::getUserId, currentUser.getPairedUserId());
         if (status != null) {
-            queryWrapper.eq("status", status);
+            queryWrapper.eq(Wish::getStatus, status);
         }
-        queryWrapper.orderByDesc("create_time");
+        queryWrapper.orderByDesc(Wish::getCreateTime);
 
         // 分页查询
         return this.page(new Page<>(pageNum, pageSize), queryWrapper);

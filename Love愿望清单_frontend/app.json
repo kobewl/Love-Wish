@@ -51,5 +51,12 @@
   "lazyCodeLoading": "requiredComponents",
   "useExtendedLib": {
     "weui": true
+  },
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-loading": "@vant/weapp/loading/index"
   }
 }

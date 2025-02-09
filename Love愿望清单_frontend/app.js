@@ -44,31 +44,32 @@ App({
       })
       return false
     }
+    this.globalData.token = token
     return true
   },
 
   // 显示错误提示
-  showError(msg) {
+  showError(message) {
     wx.showToast({
-      title: msg || '操作失败',
+      title: message,
       icon: 'none',
       duration: 2000
     })
   },
 
   // 显示成功提示
-  showSuccess(msg) {
+  showSuccess(message) {
     wx.showToast({
-      title: msg || '操作成功',
+      title: message,
       icon: 'success',
       duration: 2000
     })
   },
 
   // 显示加载提示
-  showLoading(msg) {
+  showLoading(title = '加载中...') {
     wx.showLoading({
-      title: msg || '加载中...',
+      title: title,
       mask: true
     })
   },

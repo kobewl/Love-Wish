@@ -32,30 +32,58 @@ Page({
 
   // 获取愿望列表
   async getWishList() {
-    this.setData({ loading: true })
+    wx.showLoading({
+      title: '加载中...',
+      mask: true
+    })
+    
     try {
-      const res = await wx.request({
-        url: `${app.globalData.baseUrl}/api/wish/my`,
-        method: 'GET',
-        header: {
-          'Authorization': `Bearer ${wx.getStorageSync('token')}`,
-          'Content-Type': 'application/json'
-        }
+      const token = wx.getStorageSync('token')
+      if (!token) {
+        throw new Error('未登录')
+      }
+
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${app.globalData.baseUrl}/api/wish/my`,
+          method: 'GET',
+          header: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          success: resolve,
+          fail: reject
+        })
       })
 
-      if (res.statusCode === 200 && res.data.code === 0) {
-        this.setData({
-          wishList: res.data.data.records,
-          loading: false
-        })
+      if (res.statusCode === 200 && res.data && res.data.code === 0) {
+        const records = res.data.data.records || []
+        const wishList = records.map(item => ({
+          id: item.id,
+          userId: item.user_id,
+          title: item.title,
+          description: item.description || '',
+          imageUrl: item.image_url || '',
+          status: item.status || 0,
+          createTime: item.create_time ? item.create_time.substring(0, 16).replace('T', ' ') : '',
+          updateTime: item.update_time ? item.update_time.substring(0, 16).replace('T', ' ') : '',
+          completeTime: item.complete_time ? item.complete_time.substring(0, 16).replace('T', ' ') : ''
+        }))
+
+        this.setData({ wishList })
       } else {
-        this.setData({ loading: false })
-        app.showError(res.data?.message || '获取愿望列表失败')
+        throw new Error(res.data?.message || '获取愿望列表失败')
       }
     } catch (err) {
       console.error('获取愿望列表失败:', err)
+      wx.showToast({
+        title: err.message || '网络请求失败',
+        icon: 'none',
+        duration: 2000
+      })
+    } finally {
+      wx.hideLoading()
       this.setData({ loading: false })
-      app.showError('网络请求失败')
     }
   },
 
@@ -90,14 +118,14 @@ Page({
   // 输入标题
   onTitleInput(e) {
     this.setData({
-      'newWish.title': e.detail
+      'newWish.title': e.detail.value || e.detail
     })
   },
 
   // 输入描述
   onDescInput(e) {
     this.setData({
-      'newWish.description': e.detail
+      'newWish.description': e.detail.value || e.detail
     })
   },
 
@@ -159,8 +187,11 @@ Page({
   // 确认添加/编辑
   async onConfirmAdd() {
     const { title, description } = this.data.newWish
-    if (!title) {
-      app.showError('请输入愿望标题')
+    if (!title || !title.trim()) {
+      wx.showToast({
+        title: '请输入愿望标题',
+        icon: 'none'
+      })
       return
     }
 
@@ -175,33 +206,68 @@ Page({
         : `${app.globalData.baseUrl}/api/wish`
       
       const method = this.data.editingWish ? 'PUT' : 'POST'
+      
+      const requestData = {
+        title: title.trim(),
+        description: description ? description.trim() : '',
+        imageUrl: this.data.newWish.imageUrl || ''
+      }
 
-      const res = await wx.request({
+      console.log('发送请求:', {
         url,
         method,
-        header: {
-          'Authorization': `Bearer ${wx.getStorageSync('token')}`,
-          'Content-Type': 'application/json'
-        },
-        data: this.data.newWish
+        data: requestData
       })
 
-      if (res.statusCode === 200 && res.data.code === 0) {
-        wx.showToast({
-          title: this.data.editingWish ? '更新成功' : '添加成功',
-          icon: 'success'
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url,
+          method,
+          header: {
+            'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+            'Content-Type': 'application/json'
+          },
+          data: requestData,
+          success: resolve,
+          fail: reject
         })
+      })
+
+      console.log('请求响应:', res)
+
+      if (res.statusCode === 200 && res.data && res.data.code === 0) {
+        // 清空表单并关闭弹窗
         this.setData({
           showAddPopup: false,
-          editingWish: null
+          editingWish: null,
+          newWish: {
+            title: '',
+            description: '',
+            imageUrl: ''
+          },
+          tempImageUrl: ''
         })
-        this.getWishList()
+
+        wx.showToast({
+          title: this.data.editingWish ? '更新成功' : '添加成功',
+          icon: 'success',
+          duration: 2000
+        })
+        
+        // 延迟重新获取列表
+        setTimeout(() => {
+          this.getWishList()
+        }, 1000)
       } else {
-        app.showError(res.data?.message || (this.data.editingWish ? '更新失败' : '添加失败'))
+        throw new Error(res.data?.message || '请求失败')
       }
     } catch (err) {
-      console.error(this.data.editingWish ? '更新愿望失败:' : '添加愿望失败:', err)
-      app.showError('网络请求失败')
+      console.error('操作失败:', err)
+      wx.showToast({
+        title: err.message || '网络请求失败',
+        icon: 'none',
+        duration: 2000
+      })
     } finally {
       wx.hideLoading()
     }
