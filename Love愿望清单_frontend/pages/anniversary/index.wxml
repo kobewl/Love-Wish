@@ -21,7 +21,10 @@
   <!-- 纪念日列表 -->
   <view class="anniversary-list">
     <view class="list-header">
-      <text class="title">我的纪念日</text>
+      <view class="header-left">
+        <text class="title">我的纪念日</text>
+        <text class="subtitle">记录美好时光</text>
+      </view>
       <view class="add-btn" bindtap="showAddPopup">
         <van-icon name="plus" color="#FF69B4" size="40rpx" />
       </view>
@@ -43,11 +46,15 @@
         >
           <view class="item-left">
             <view class="item-type" style="background: {{ item.type === 0 ? '#FF69B4' : item.type === 1 ? '#FFB6C1' : '#FFC0CB' }}">
+              <van-icon name="{{ item.type === 0 ? 'like' : item.type === 1 ? 'gift' : 'star' }}" size="24rpx" />
               {{ item.type === 0 ? '恋爱' : item.type === 1 ? '生日' : '其他' }}
             </view>
             <view class="item-info">
               <text class="item-title">{{ item.title }}</text>
-              <text class="item-date">{{ item.date }}</text>
+              <view class="item-date">
+                <van-icon name="clock" size="24rpx" color="#999" />
+                <text>{{ item.date }}</text>
+              </view>
             </view>
           </view>
           <view class="item-right">
@@ -69,87 +76,173 @@
   <!-- 添加/编辑弹窗 -->
   <van-popup
     show="{{ showAddPopup }}"
-    round
     position="bottom"
     bind:close="onCloseAddPopup"
-    custom-style="min-height: 50%"
+    custom-style="min-height: 85vh; background: #f7f8fa;"
+    round="{{ false }}"
   >
-    <view class="popup-content">
-      <view class="popup-title">{{ isEdit ? '编辑纪念日' : '添加纪念日' }}</view>
-      <view class="form-content">
-        <van-field
-          value="{{ newAnniversary.title }}"
-          label="标题"
-          placeholder="请输入纪念日标题"
-          bind:input="onTitleInput"
-        />
-        <van-cell
-          title="日期"
-          value="{{ newAnniversary.date }}"
-          bind:click="onShowDatePicker"
-          is-link
-        />
-        <van-cell
-          title="类型"
-          value="{{ typeOptions[newAnniversary.type] }}"
-          bind:click="onShowTypePicker"
-          is-link
-        />
-        <van-cell
-          title="重复"
-          value="{{ repeatOptions[newAnniversary.repeatType] }}"
-          bind:click="onShowRepeatPicker"
-          is-link
-        />
-        <van-cell
-          title="提醒"
-          value="{{ reminderOptions[reminderIndex] }}"
-          bind:click="onShowReminderPicker"
-          is-link
-        />
+    <view class="popup-page">
+      <view class="popup-header">
+        <van-icon name="edit" size="32rpx" />
+        <text>{{ isEdit ? '编辑纪念日' : '添加纪念日' }}</text>
       </view>
-      <view class="btn-group">
-        <button class="cancel-btn" bindtap="onCloseAddPopup">取消</button>
-        <button class="confirm-btn" bindtap="onConfirmPopup">确定</button>
+
+      <view class="popup-content">
+        <view class="form-group">
+          <view class="form-item">
+            <text class="form-label">标题</text>
+            <input 
+              class="form-input" 
+              placeholder="请输入纪念日标题" 
+              value="{{ newAnniversary.title }}"
+              bindinput="onTitleInput"
+            />
+          </view>
+          
+          <view class="form-item" bindtap="onShowDatePicker">
+            <text class="form-label">日期</text>
+            <view class="form-value">
+              <text>{{ newAnniversary.date }}</text>
+              <van-icon name="arrow" />
+            </view>
+          </view>
+          
+          <view class="form-item" bindtap="onShowTypePicker">
+            <text class="form-label">类型</text>
+            <view class="form-value">
+              <text>{{ typeOptions[newAnniversary.type] }}</text>
+              <van-icon name="arrow" />
+            </view>
+          </view>
+          
+          <view class="form-item" bindtap="onShowRepeatPicker">
+            <text class="form-label">重复类型</text>
+            <view class="form-value">
+              <text>{{ repeatOptions[newAnniversary.repeatType] }}</text>
+              <van-icon name="arrow" />
+            </view>
+          </view>
+          
+          <view class="form-item" bindtap="onShowReminderPicker">
+            <text class="form-label">提醒</text>
+            <view class="form-value">
+              <text>{{ reminderOptions[reminderIndex] }}</text>
+              <van-icon name="arrow" />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="popup-footer">
+        <button class="btn-cancel" bindtap="onCloseAddPopup">取消</button>
+        <button class="btn-confirm" bindtap="onConfirmPopup">确定</button>
       </view>
     </view>
+  </van-popup>
+
+  <!-- 日期选择器 -->
+  <van-popup
+    show="{{ showDatePicker }}"
+    position="bottom"
+    bind:close="onCloseDatePicker"
+  >
+    <van-datetime-picker
+      type="date"
+      value="{{ currentDate }}"
+      min-date="{{ minDate }}"
+      max-date="{{ maxDate }}"
+      bind:confirm="onConfirmDatePicker"
+      bind:cancel="onCloseDatePicker"
+    />
+  </van-popup>
+
+  <!-- 类型选择器 -->
+  <van-popup
+    show="{{ showTypePicker }}"
+    position="bottom"
+    bind:close="onCloseTypePicker"
+  >
+    <van-picker
+      show-toolbar
+      columns="{{ typeOptions }}"
+      bind:confirm="onConfirmTypePicker"
+      bind:cancel="onCloseTypePicker"
+    />
+  </van-popup>
+
+  <!-- 重复类型选择器 -->
+  <van-popup
+    show="{{ showRepeatPicker }}"
+    position="bottom"
+    bind:close="onCloseRepeatPicker"
+  >
+    <van-picker
+      show-toolbar
+      columns="{{ repeatOptions }}"
+      bind:confirm="onConfirmRepeatPicker"
+      bind:cancel="onCloseRepeatPicker"
+    />
+  </van-popup>
+
+  <!-- 提醒选择器 -->
+  <van-popup
+    show="{{ showReminderPicker }}"
+    position="bottom"
+    bind:close="onCloseReminderPicker"
+  >
+    <van-picker
+      show-toolbar
+      columns="{{ reminderOptions }}"
+      bind:confirm="onConfirmReminderPicker"
+      bind:cancel="onCloseReminderPicker"
+    />
   </van-popup>
 
   <!-- 纪念日详情弹窗 -->
   <van-popup
     show="{{ showDetailPopup }}"
-    round
     position="bottom"
     bind:close="onCloseDetailPopup"
-    custom-style="min-height: 50%"
+    custom-style="min-height: 85vh; background: #f7f8fa;"
+    round="{{ false }}"
   >
-    <view class="popup-content">
-      <view class="popup-title">纪念日详情</view>
-      <view class="detail-content">
-        <view class="detail-item">
-          <text class="label">标题</text>
-          <text class="value">{{ currentAnniversary.title }}</text>
-        </view>
-        <view class="detail-item">
-          <text class="label">日期</text>
-          <text class="value">{{ currentAnniversary.date }}</text>
-        </view>
-        <view class="detail-item">
-          <text class="label">类型</text>
-          <text class="value">{{ typeOptions[currentAnniversary.type] }}</text>
-        </view>
-        <view class="detail-item">
-          <text class="label">重复</text>
-          <text class="value">{{ repeatOptions[currentAnniversary.repeatType] }}</text>
-        </view>
-        <view class="detail-item">
-          <text class="label">提醒</text>
-          <text class="value">{{ reminderOptions[getReminderIndex(currentAnniversary.reminderDays)] }}</text>
+    <view class="popup-page">
+      <view class="popup-header">
+        <text>纪念日详情</text>
+      </view>
+
+      <view class="popup-content">
+        <view class="form-group">
+          <view class="form-item">
+            <text class="form-label">标题</text>
+            <text class="detail-value">{{ currentAnniversary.title }}</text>
+          </view>
+          
+          <view class="form-item">
+            <text class="form-label">日期</text>
+            <text class="detail-value">{{ currentAnniversary.date }}</text>
+          </view>
+          
+          <view class="form-item">
+            <text class="form-label">类型</text>
+            <text class="detail-value">{{ typeOptions[currentAnniversary.type] }}</text>
+          </view>
+          
+          <view class="form-item">
+            <text class="form-label">重复</text>
+            <text class="detail-value">{{ repeatOptions[currentAnniversary.repeatType] }}</text>
+          </view>
+          
+          <view class="form-item">
+            <text class="form-label">提醒</text>
+            <text class="detail-value">{{ reminderOptions[getReminderIndex(currentAnniversary.reminderDays)] }}</text>
+          </view>
         </view>
       </view>
-      <view class="btn-group">
-        <button class="delete-btn" bindtap="onDeleteAnniversary">删除</button>
-        <button class="edit-btn" bindtap="onEditAnniversary">编辑</button>
+
+      <view class="popup-footer">
+        <button class="btn-delete" bindtap="onDeleteAnniversary">删除</button>
+        <button class="btn-edit" bindtap="onEditAnniversary">编辑</button>
       </view>
     </view>
   </van-popup>

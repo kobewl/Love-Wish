@@ -88,24 +88,25 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f5f5f5;
 }
 
-.list-header .title {
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-left .title {
   font-size: 36rpx;
   font-weight: 600;
   color: #333;
-  position: relative;
+  margin-bottom: 8rpx;
 }
 
-.list-header .title::after {
-  content: "";
-  position: absolute;
-  bottom: -8rpx;
-  left: 0;
-  width: 48rpx;
-  height: 4rpx;
-  background: #ff69b4;
-  border-radius: 2rpx;
+.header-left .subtitle {
+  font-size: 24rpx;
+  color: #999;
 }
 
 .add-btn {
@@ -114,14 +115,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
-  border-radius: 40rpx;
-  box-shadow: 0 4rpx 16rpx rgba(255, 105, 180, 0.2);
+  background: rgba(255, 105, 180, 0.1);
+  border-radius: 50%;
   transition: all 0.3s;
 }
 
 .add-btn:active {
   transform: scale(0.95);
+  background: rgba(255, 105, 180, 0.2);
 }
 
 /* 列表内容 */
@@ -130,14 +131,11 @@
 }
 
 .anniversary-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24rpx;
   margin-bottom: 24rpx;
   background: #fff;
   border-radius: 16rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
   transition: all 0.3s;
 }
 
@@ -153,11 +151,12 @@
 }
 
 .item-type {
-  padding: 6rpx 20rpx;
-  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
   font-size: 24rpx;
-  color: #fff;
-  margin-right: 20rpx;
 }
 
 .item-info {
@@ -173,8 +172,9 @@
 }
 
 .item-date {
-  font-size: 26rpx;
-  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 
 .item-right {
@@ -216,42 +216,152 @@
   line-height: 1.6;
 }
 
-/* 弹窗样式 */
-.popup-content {
-  padding: 40rpx;
+/* 弹窗页面样式 */
+.popup-page {
+  min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: #f7f8fa;
 }
 
 .popup-header {
+  position: relative;
+  text-align: center;
+  padding: 32rpx;
+  font-size: 32rpx;
+  color: #333;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+
+.popup-content {
+  flex: 1;
+  padding: 32rpx 0;
+  overflow-y: auto;
+}
+
+.form-group {
+  background: #fff;
+}
+
+.form-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40rpx;
+  padding: 32rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
 }
 
-.popup-title {
-  font-size: 36rpx;
-  font-weight: 600;
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  color: #333;
+  font-size: 28rpx;
+}
+
+.form-input {
+  flex: 1;
+  text-align: right;
+  font-size: 28rpx;
   color: #333;
 }
 
-.form-content {
-  margin-bottom: 40rpx;
+.form-input::placeholder {
+  color: #999;
+}
+
+.form-value {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: #666;
+  font-size: 28rpx;
+}
+
+.detail-value {
+  color: #666;
+  font-size: 28rpx;
 }
 
 .popup-footer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  padding: 32rpx;
+  background: #fff;
+  border-top: 1rpx solid #eee;
+  display: flex;
   gap: 24rpx;
 }
 
-/* 选择器样式 */
-.van-picker {
-  --picker-loading-icon-color: #ff69b4;
-  --picker-loading-mask-color: rgba(255, 255, 255, 0.9);
+.btn-cancel,
+.btn-confirm,
+.btn-delete,
+.btn-edit {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  font-size: 32rpx;
+  border-radius: 0;
 }
 
-.van-datetime-picker {
-  --picker-option-selected-text-color: #ff69b4;
+.btn-cancel {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.btn-confirm {
+  background: #ff69b4;
+  color: #fff;
+}
+
+.btn-delete {
+  background: #fff;
+  color: #ff4d4f;
+  border: none;
+}
+
+.btn-edit {
+  background: #ff69b4;
+  color: #fff;
+}
+
+/* 选择器样式优化 */
+.van-picker {
+  background: #fff !important;
+}
+
+.van-picker__toolbar {
+  border-bottom: 1rpx solid #eee !important;
+}
+
+.van-picker__cancel,
+.van-picker__confirm {
+  font-size: 32rpx !important;
+  padding: 0 32rpx !important;
+}
+
+.van-picker__confirm {
+  color: #ff69b4 !important;
+}
+
+.van-picker__cancel {
+  color: #666 !important;
+}
+
+/* 动画优化 */
+.popup-page {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 /* 加载状态 */
@@ -271,11 +381,8 @@
 }
 
 .detail-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24rpx;
-  border-bottom: 2rpx solid rgba(0, 0, 0, 0.04);
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
 }
 
 .detail-item:last-child {
@@ -320,4 +427,117 @@
 .form-picker .van-icon {
   color: #999;
   font-size: 28rpx;
+}
+
+/* 添加纪念日弹窗样式 */
+.add-popup {
+  background: #fff;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.add-popup-title,
+.detail-popup-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #eee;
+}
+
+.add-form {
+  flex: 1;
+  padding: 0 30rpx;
+}
+
+.form-item {
+  position: relative;
+  padding: 24rpx 0;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.form-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.form-value {
+  flex: 1;
+  padding-right: 40rpx;
+}
+
+.add-popup-buttons {
+  display: flex;
+  padding: 20rpx;
+  gap: 20rpx;
+  border-top: 1rpx solid #eee;
+}
+
+.btn-cancel,
+.btn-confirm,
+.btn-delete,
+.btn-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  height: 88rpx;
+  font-size: 32rpx;
+  border-radius: 8rpx;
+  transition: all 0.3s;
+}
+
+.btn-cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.btn-confirm {
+  background: linear-gradient(to right, #ff69b4, #ff8dc7);
+  color: #fff;
+}
+
+.btn-delete {
+  background: #fff;
+  color: #ff4d4f;
+  border: 2rpx solid #ff4d4f;
+}
+
+.btn-edit {
+  background: #ff69b4;
+  color: #fff;
+}
+
+.btn-cancel:active,
+.btn-confirm:active,
+.btn-delete:active,
+.btn-edit:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 修改placeholder样式 */
+.form-input::placeholder {
+  color: #999;
+}
+
+/* 去除按钮默认样式 */
+button {
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
+button::after {
+  border: none;
 }
