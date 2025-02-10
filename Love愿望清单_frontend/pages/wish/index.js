@@ -150,29 +150,53 @@ Page({
           mask: true
         })
 
-        const uploadRes = await wx.uploadFile({
-          url: `${app.globalData.baseUrl}/api/file/upload`,
-          filePath: res.tempFilePaths[0],
-          name: 'file',
-          header: {
-            'Authorization': `Bearer ${wx.getStorageSync('token')}`
-          }
+        const token = wx.getStorageSync('token')
+        if (!token) {
+          throw new Error('未登录')
+        }
+
+        const uploadRes = await new Promise((resolve, reject) => {
+          wx.uploadFile({
+            url: `${app.globalData.baseUrl}/api/file/upload`,
+            filePath: res.tempFilePaths[0],
+            name: 'file',
+            header: {
+              'Authorization': `Bearer ${token}`
+            },
+            success: resolve,
+            fail: reject
+          })
         })
 
-        wx.hideLoading()
+        console.log('上传响应:', uploadRes)
 
-        const data = JSON.parse(uploadRes.data)
-        if (data.code === 0) {
-          this.setData({
-            'newWish.imageUrl': data.data.url
-          })
+        if (uploadRes.statusCode === 200) {
+          const data = JSON.parse(uploadRes.data)
+          if (data.code === 0 && data.data && data.data.url) {
+            this.setData({
+              'newWish.imageUrl': data.data.url
+            })
+            wx.showToast({
+              title: '上传成功',
+              icon: 'success',
+              duration: 2000
+            })
+          } else {
+            throw new Error(data.message || '上传失败')
+          }
         } else {
-          app.showError('图片上传失败')
+          throw new Error('上传失败')
         }
       }
     } catch (err) {
-      console.error('选择图片失败:', err)
-      app.showError('选择图片失败')
+      console.error('选择/上传图片失败:', err)
+      wx.showToast({
+        title: err.message || '操作失败',
+        icon: 'none',
+        duration: 2000
+      })
+    } finally {
+      wx.hideLoading()
     }
   },
 
