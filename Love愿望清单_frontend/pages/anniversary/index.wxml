@@ -66,120 +66,51 @@
     </view>
   </view>
 
-  <!-- 添加纪念日弹窗 -->
+  <!-- 添加/编辑弹窗 -->
   <van-popup
     show="{{ showAddPopup }}"
     round
     position="bottom"
     bind:close="onCloseAddPopup"
-    custom-style="min-height: 60%"
+    custom-style="min-height: 50%"
   >
     <view class="popup-content">
-      <view class="popup-header">
-        <text class="popup-title">添加纪念日</text>
-        <van-icon name="cross" bindtap="onCloseAddPopup" />
-      </view>
+      <view class="popup-title">{{ isEdit ? '编辑纪念日' : '添加纪念日' }}</view>
       <view class="form-content">
         <van-field
           value="{{ newAnniversary.title }}"
           label="标题"
           placeholder="请输入纪念日标题"
-          bind:change="onTitleInput"
+          bind:input="onTitleInput"
         />
-        <van-field
+        <van-cell
+          title="日期"
           value="{{ newAnniversary.date }}"
-          label="日期"
-          placeholder="请选择日期"
-          readonly
-          bindtap="onShowDatePicker"
+          bind:click="onShowDatePicker"
+          is-link
         />
-        <van-popup
-          show="{{ showDatePicker }}"
-          position="bottom"
-          round
-          bind:close="onCloseDatePicker"
-        >
-          <van-datetime-picker
-            type="date"
-            value="{{ currentDate }}"
-            min-date="{{ minDate }}"
-            max-date="{{ maxDate }}"
-            bind:confirm="onConfirmDatePicker"
-            bind:cancel="onCloseDatePicker"
-            formatter="{{ formatter }}"
-          />
-        </van-popup>
-        <van-field
+        <van-cell
+          title="类型"
           value="{{ typeOptions[newAnniversary.type] }}"
-          label="类型"
-          placeholder="请选择类型"
-          readonly
-          bindtap="onShowTypePicker"
+          bind:click="onShowTypePicker"
+          is-link
         />
-        <van-popup
-          show="{{ showTypePicker }}"
-          position="bottom"
-          round
-          bind:close="onCloseTypePicker"
-        >
-          <van-picker
-            show-toolbar
-            title="选择类型"
-            columns="{{ typeOptions }}"
-            default-index="{{ newAnniversary.type }}"
-            bind:cancel="onCloseTypePicker"
-            bind:confirm="onConfirmTypePicker"
-          />
-        </van-popup>
-        <van-field
+        <van-cell
+          title="重复"
           value="{{ repeatOptions[newAnniversary.repeatType] }}"
-          label="重复类型"
-          placeholder="请选择重复类型"
-          readonly
-          bindtap="onShowRepeatPicker"
-          input-align="right"
+          bind:click="onShowRepeatPicker"
+          is-link
         />
-        <van-popup
-          show="{{ showRepeatPicker }}"
-          position="bottom"
-          round
-          bind:close="onCloseRepeatPicker"
-        >
-          <van-picker
-            show-toolbar
-            title="选择重复类型"
-            columns="{{ repeatOptions }}"
-            default-index="{{ newAnniversary.repeatType }}"
-            bind:cancel="onCloseRepeatPicker"
-            bind:confirm="onRepeatChange"
-          />
-        </van-popup>
-        <van-field
+        <van-cell
+          title="提醒"
           value="{{ reminderOptions[reminderIndex] }}"
-          label="提醒"
-          placeholder="请选择提醒时间"
-          readonly
-          bindtap="onShowReminderPicker"
+          bind:click="onShowReminderPicker"
+          is-link
         />
-        <van-popup
-          show="{{ showReminderPicker }}"
-          position="bottom"
-          round
-          bind:close="onCloseReminderPicker"
-        >
-          <van-picker
-            show-toolbar
-            title="选择提醒时间"
-            columns="{{ reminderOptions }}"
-            default-index="{{ reminderIndex }}"
-            bind:cancel="onCloseReminderPicker"
-            bind:confirm="onConfirmReminderPicker"
-          />
-        </van-popup>
       </view>
-      <view class="popup-footer">
-        <van-button plain type="default" block bindtap="onCloseAddPopup">取消</van-button>
-        <van-button type="primary" color="#FF69B4" block bindtap="onConfirmAdd">确定</van-button>
+      <view class="btn-group">
+        <button class="cancel-btn" bindtap="onCloseAddPopup">取消</button>
+        <button class="confirm-btn" bindtap="onConfirmPopup">确定</button>
       </view>
     </view>
   </van-popup>

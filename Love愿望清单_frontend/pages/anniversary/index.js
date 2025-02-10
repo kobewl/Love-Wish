@@ -1,5 +1,5 @@
 const app = getApp()
-const dayjs = require('dayjs')
+var dayjs = require('../../utils/dayjs.min.js')
 
 Page({
   data: {
@@ -12,7 +12,7 @@ Page({
     currentAnniversary: null,
     newAnniversary: {
       title: '',
-      date: dayjs().format('YYYY-MM-DD'),
+      date: '',  // 初始化时不设置日期
       type: 0,
       repeatType: 0,
       reminderDays: 7
@@ -29,11 +29,18 @@ Page({
     animationData: {},
     slideAnimation: {},
     listAnimations: [],
-    formatter: null
+    formatter: null,
+    isEdit: false,
+    isPageActive: true
   },
 
-  onLoad() {
+  onLoad: function() {
     if (!app.checkLoginStatus()) return
+    
+    this.setData({ 
+      isPageActive: true,
+      'newAnniversary.date': dayjs().format('YYYY-MM-DD')  // 在onLoad时设置初始日期
+    })
     
     // 创建动画实例
     this.animation = wx.createAnimation({
@@ -48,11 +55,13 @@ Page({
     })
 
     // 设置日历formatter
+    const that = this
     this.setData({
-      formatter: (day) => {
-        if (!day || !this.data.anniversaryList) return day
+      formatter(day) {
+        if (!day) return day
         const date = dayjs(day.date).format('YYYY-MM-DD')
-        const matched = this.data.anniversaryList.find(item => {
+        const list = that.data.anniversaryList || []
+        const matched = list.find(item => {
           if (!item || !item.date) return false
           if (item.repeatType === 0) {
             return item.date === date
@@ -70,10 +79,22 @@ Page({
         }
         return day
       }
-    }, () => {
-      // 在设置完formatter后再获取纪念日列表
-      this.getAnniversaryList()
     })
+
+    // 初始化完成后获取列表
+    this.getAnniversaryList()
+  },
+
+  onUnload() {
+    // 页面卸载时，标记页面为非活跃状态
+    this.setData({ isPageActive: false })
+  },
+
+  // 安全的setData方法
+  safeSetData(data, callback) {
+    if (this.data.isPageActive) {
+      this.setData(data, callback)
+    }
   },
 
   onShow() {
@@ -199,6 +220,7 @@ Page({
     
     this.setData({
       showAddPopup: true,
+      isEdit: false,  // 标记为新增模式
       newAnniversary: {
         title: '',
         date: dayjs().format('YYYY-MM-DD'),
@@ -213,7 +235,15 @@ Page({
   // 关闭添加弹窗
   onCloseAddPopup() {
     this.setData({
-      showAddPopup: false
+      showAddPopup: false,
+      newAnniversary: {
+        title: '',
+        date: dayjs().format('YYYY-MM-DD'),
+        type: 0,
+        repeatType: 0,
+        reminderDays: 7
+      },
+      reminderIndex: 3
     })
   },
 
@@ -254,13 +284,12 @@ Page({
 
   // 输入标题
   onTitleInput(e) {
-    const value = e.detail && (e.detail.value || e.detail);
-    if (value === undefined || value === null) return;
+    const value = e.detail && (e.detail.value || e.detail)
+    if (value === undefined || value === null) return
     
-    const title = String(value).trim();
-    this.setData({
-      'newAnniversary.title': title
-    });
+    this.safeSetData({
+      'newAnniversary.title': String(value).trim()
+    })
   },
 
   // 选择日期
@@ -279,25 +308,20 @@ Page({
 
   // 显示重复类型选择器
   onShowRepeatPicker() {
-    this.setData({
-      showRepeatPicker: true
-    });
+    this.setData({ showRepeatPicker: true })
   },
 
   // 关闭重复类型选择器
   onCloseRepeatPicker() {
-    this.setData({
-      showRepeatPicker: false
-    });
+    this.setData({ showRepeatPicker: false })
   },
 
-  // 选择重复类型
-  onRepeatChange(e) {
-    const { value, index } = e.detail;
+  // 确认重复类型选择
+  onConfirmRepeatPicker(e) {
     this.setData({
-      'newAnniversary.repeatType': index,
+      'newAnniversary.repeatType': e.detail.index,
       showRepeatPicker: false
-    });
+    })
   },
 
   // 选择提醒时间
@@ -311,11 +335,12 @@ Page({
 
   // 获取提醒索引
   getReminderIndex(days) {
-    return this.data.reminderDaysMap.indexOf(days)
+    const index = this.data.reminderDaysMap.indexOf(days)
+    return index === -1 ? 3 : index // 默认7天
   },
 
   // 确认添加
-  async onConfirmAdd() {
+  onConfirmAdd: function() {
     const { title, date, type, repeatType, reminderDays } = this.data.newAnniversary
     
     // 验证标题
@@ -328,109 +353,176 @@ Page({
       return
     }
 
+    // 验证日期
+    if (!date) {
+      wx.showToast({
+        title: '请选择日期',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
     wx.showLoading({
       title: '添加中...',
       mask: true
     })
 
-    try {
-      const requestData = {
-        title: title.trim(),
-        date: date,
-        type: parseInt(type),
-        repeatType: parseInt(repeatType),
-        reminderDays: parseInt(reminderDays)
-      }
+    const requestData = {
+      title: title.trim(),
+      date: date,
+      type: parseInt(type) || 0,
+      repeatType: parseInt(repeatType) || 0,
+      reminderDays: parseInt(reminderDays) || 7
+    }
 
-      console.log('提交的数据:', requestData)
+    console.log('提交的数据:', requestData)
 
-      const res = await wx.request({
-        url: `${app.globalData.baseUrl}/api/anniversary`,
-        method: 'POST',
-        header: {
-          'Authorization': `Bearer ${wx.getStorageSync('token')}`,
-          'Content-Type': 'application/json'
-        },
-        data: requestData
-      })
+    const that = this
+    wx.request({
+      url: `${app.globalData.baseUrl}/api/anniversary`,
+      method: 'POST',
+      header: {
+        'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+        'Content-Type': 'application/json'
+      },
+      data: requestData,
+      success: function(res) {
+        console.log('添加纪念日响应:', res)
 
-      console.log('添加纪念日响应:', res)
+        if (res.statusCode === 200 && res.data && res.data.code === 0) {
+          wx.showToast({
+            title: '添加成功',
+            icon: 'success',
+            duration: 2000
+          })
+          
+          // 重置表单
+          that.safeSetData({
+            showAddPopup: false,
+            newAnniversary: {
+              title: '',
+              date: dayjs().format('YYYY-MM-DD'),
+              type: 0,
+              repeatType: 0,
+              reminderDays: 7
+            },
+            reminderIndex: 3
+          })
 
-      if (res.statusCode === 200 && res.data && res.data.code === 0) {
+          // 延迟刷新列表
+          setTimeout(() => {
+            if (that.data.isPageActive) {
+              that.getAnniversaryList()
+            }
+          }, 1000)
+        } else {
+          wx.showToast({
+            title: res.data?.message || '添加失败',
+            icon: 'none',
+            duration: 2000
+          })
+        }
+      },
+      fail: function(err) {
+        console.error('添加纪念日失败:', err)
         wx.showToast({
-          title: '添加成功',
-          icon: 'success',
+          title: '网络请求失败',
+          icon: 'none',
           duration: 2000
         })
-        this.setData({
-          showAddPopup: false
-        })
-        // 重新加载列表
-        setTimeout(() => {
-          this.getAnniversaryList()
-        }, 1000)
-      } else {
-        throw new Error(res.data?.message || '添加失败')
+      },
+      complete: function() {
+        wx.hideLoading()
       }
-    } catch (err) {
-      console.error('添加纪念日失败:', err)
-      wx.showToast({
-        title: err.message || '网络请求失败',
-        icon: 'none',
-        duration: 2000
-      })
-    } finally {
-      wx.hideLoading()
-    }
+    })
   },
 
   // 删除纪念日
   onDeleteAnniversary() {
+    if (!this.data.currentAnniversary || !this.data.currentAnniversary.id) {
+      wx.showToast({
+        title: '数据异常',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
+    const currentId = this.data.currentAnniversary.id
+
     wx.showModal({
       title: '提示',
       content: '确定要删除这个纪念日吗？',
-      success: async (res) => {
-        if (res.confirm) {
+      success: (modalRes) => {
+        if (modalRes.confirm) {
           wx.showLoading({
             title: '删除中...',
             mask: true
           })
 
-          try {
-            const res = await wx.request({
-              url: `${app.globalData.baseUrl}/api/anniversary/${this.data.currentAnniversary.id}`,
-              method: 'DELETE',
-              header: {
-                'Authorization': `Bearer ${wx.getStorageSync('token')}`,
-                'Content-Type': 'application/json'
-              }
-            })
+          // 使用Promise包装wx.request
+          wx.request({
+            url: `${app.globalData.baseUrl}/api/anniversary/${currentId}`,
+            method: 'DELETE',
+            header: {
+              'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+              'Content-Type': 'application/json'
+            },
+            success: (res) => {
+              console.log('删除纪念日响应:', res)
+              
+              if (res.statusCode === 200) {
+                wx.showToast({
+                  title: '删除成功',
+                  icon: 'success',
+                  duration: 2000
+                })
+                
+                // 关闭弹窗
+                this.safeSetData({
+                  showDetailPopup: false,
+                  currentAnniversary: null
+                })
 
-            if (res.statusCode === 200 && res.data.code === 0) {
+                // 延迟刷新列表
+                setTimeout(() => {
+                  if (this.data.isPageActive) {
+                    this.getAnniversaryList()
+                  }
+                }, 1000)
+              } else {
+                wx.showToast({
+                  title: res.data?.message || '删除失败',
+                  icon: 'none',
+                  duration: 2000
+                })
+              }
+            },
+            fail: (err) => {
+              console.error('删除纪念日失败:', err)
               wx.showToast({
-                title: '删除成功',
-                icon: 'success'
+                title: '网络请求失败',
+                icon: 'none',
+                duration: 2000
               })
-              this.setData({
+            },
+            complete: () => {
+              wx.hideLoading()
+              
+              // 无论成功失败，都关闭弹窗并刷新列表
+              this.safeSetData({
                 showDetailPopup: false,
                 currentAnniversary: null
               })
-              this.getAnniversaryList()
-            } else {
-              wx.showToast({
-                title: res.data?.message || '删除失败',
-                icon: 'none'
-              })
+              
+              setTimeout(() => {
+                if (this.data.isPageActive) {
+                  this.getAnniversaryList()
+                }
+              }, 1000)
             }
-          } catch (err) {
-            console.error('删除纪念日失败:', err)
-            wx.showToast({
-              title: '网络请求失败',
-              icon: 'none'
-            })
-          } finally {
-            wx.hideLoading()
-          }
+          })
         }
       }
     })
@@ -438,13 +530,139 @@ Page({
 
   // 编辑纪念日
   onEditAnniversary() {
-    this.setData({
+    const currentAnniversary = this.data.currentAnniversary
+    if (!currentAnniversary || !currentAnniversary.id) {
+      wx.showToast({
+        title: '数据异常',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
+    this.safeSetData({
       showDetailPopup: false,
       showAddPopup: true,
+      isEdit: true,  // 标记为编辑模式
       newAnniversary: {
-        ...this.data.currentAnniversary
+        id: currentAnniversary.id,  // 确保ID被传递
+        title: currentAnniversary.title,
+        date: currentAnniversary.date,
+        type: parseInt(currentAnniversary.type) || 0,
+        repeatType: parseInt(currentAnniversary.repeatType) || 0,
+        reminderDays: parseInt(currentAnniversary.reminderDays) || 7
       },
-      reminderIndex: this.getReminderIndex(this.data.currentAnniversary.reminderDays)
+      reminderIndex: this.getReminderIndex(currentAnniversary.reminderDays)
+    })
+  },
+
+  // 确认编辑
+  onConfirmEdit: function() {
+    const { id, title, date, type, repeatType, reminderDays } = this.data.newAnniversary
+    
+    // 验证ID
+    if (!id) {
+      wx.showToast({
+        title: '数据异常',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
+    // 验证标题
+    if (!title || title.trim() === '') {
+      wx.showToast({
+        title: '请输入标题',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
+    // 验证日期
+    if (!date) {
+      wx.showToast({
+        title: '请选择日期',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
+    wx.showLoading({
+      title: '更新中...',
+      mask: true
+    })
+
+    const requestData = {
+      title: title.trim(),
+      date: date,
+      type: parseInt(type) || 0,
+      repeatType: parseInt(repeatType) || 0,
+      reminderDays: parseInt(reminderDays) || 7
+    }
+
+    console.log('更新的数据:', requestData)
+
+    const that = this
+    wx.request({
+      url: `${app.globalData.baseUrl}/api/anniversary/${id}`,
+      method: 'PUT',
+      header: {
+        'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+        'Content-Type': 'application/json'
+      },
+      data: requestData,
+      success: function(res) {
+        console.log('更新纪念日响应:', res)
+
+        if (res.statusCode === 200 && res.data && res.data.code === 0) {
+          wx.showToast({
+            title: '更新成功',
+            icon: 'success',
+            duration: 2000
+          })
+          
+          // 重置表单并关闭弹窗
+          that.safeSetData({
+            showAddPopup: false,
+            isEdit: false,
+            newAnniversary: {
+              title: '',
+              date: dayjs().format('YYYY-MM-DD'),
+              type: 0,
+              repeatType: 0,
+              reminderDays: 7
+            },
+            reminderIndex: 3
+          })
+
+          // 延迟刷新列表
+          setTimeout(() => {
+            if (that.data.isPageActive) {
+              that.getAnniversaryList()
+            }
+          }, 1000)
+        } else {
+          wx.showToast({
+            title: res.data?.message || '更新失败',
+            icon: 'none',
+            duration: 2000
+          })
+        }
+      },
+      fail: function(err) {
+        console.error('更新纪念日失败:', err)
+        wx.showToast({
+          title: '网络请求失败',
+          icon: 'none',
+          duration: 2000
+        })
+      },
+      complete: function() {
+        wx.hideLoading()
+      }
     })
   },
 
@@ -519,5 +737,45 @@ Page({
     this.setData({
       showReminderPicker: false
     })
+  },
+
+  // 确认按钮点击事件
+  onConfirmPopup() {
+    if (this.data.isEdit) {
+      this.onConfirmEdit()
+    } else {
+      this.onConfirmAdd()
+    }
+  },
+
+  // 标题输入事件
+  onTitleChange(e) {
+    this.setData({
+      'newAnniversary.title': e.detail
+    })
+  },
+
+  // 日历格式化函数
+  calendarFormatter(day) {
+    if (!day) return day
+    const date = dayjs(day.date).format('YYYY-MM-DD')
+    const list = this.data.anniversaryList || []
+    const matched = list.find(item => {
+      if (!item || !item.date) return false
+      if (item.repeatType === 0) {
+        return item.date === date
+      } else {
+        return dayjs(item.date).format('MM-DD') === dayjs(date).format('MM-DD')
+      }
+    })
+    
+    if (matched) {
+      return {
+        ...day,
+        bottomInfo: matched.title.substring(0, 6) + '...',
+        className: 'anniversary-day'
+      }
+    }
+    return day
   }
 }) 

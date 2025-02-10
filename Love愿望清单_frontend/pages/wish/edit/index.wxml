@@ -1,0 +1,13 @@
+<view class="image-upload">
+  <view class="title">愿望图片</view>
+  <view class="upload-area" wx:if="{{!imageUrl}}" bindtap="chooseImage">
+    <image class="upload-icon" src="/static/images/upload.png" />
+    <text class="upload-text">点击上传图片</text>
+  </view>
+  <view class="image-preview" wx:else>
+    <image class="preview" src="{{imageUrl}}" mode="aspectFill" />
+    <view class="delete-btn" bindtap="deleteImage">
+      <image class="delete-icon" src="/static/images/delete.png" />
+    </view>
+  </view>
+</view> 

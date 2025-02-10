@@ -72,3 +72,10 @@ springfox:
   documentation:
     swagger-ui:
       enabled: true
+
+# MinIO Configuration
+minio:
+  endpoint: http://39.98.107.158:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucketName: photo
