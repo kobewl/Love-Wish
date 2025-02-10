@@ -470,3 +470,225 @@ button {
 button::after {
   border: none;
 }
+
+/* 编辑弹窗样式 */
+.edit-popup {
+  background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  overflow: hidden;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.popup-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.popup-title text {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.edit-form {
+  padding: 30rpx;
+}
+
+.form-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.form-label text {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.form-input {
+  flex: 1;
+  margin-left: 20rpx;
+  font-size: 30rpx;
+  color: #333;
+  text-align: right;
+}
+
+.form-value {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.form-value text {
+  font-size: 30rpx;
+  color: #666;
+}
+
+.popup-buttons {
+  display: flex;
+  padding: 30rpx;
+  gap: 20rpx;
+}
+
+.btn-cancel,
+.btn-confirm {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  transition: all 0.3s;
+}
+
+.btn-cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #ff6b6b, #ff4d94);
+  color: #fff;
+}
+
+.btn-cancel:active,
+.btn-confirm:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 输入框placeholder样式 */
+.form-input::placeholder {
+  color: #999;
+}
+
+/* 详情弹窗样式 */
+.detail-popup {
+  background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  overflow: hidden;
+}
+
+/* 倒计时区域 */
+.countdown-section {
+  text-align: center;
+  padding: 40rpx 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 107, 0.1),
+    rgba(255, 77, 148, 0.1)
+  );
+  border-radius: 16rpx;
+  margin: 20rpx 0 40rpx;
+}
+
+.countdown-number {
+  font-size: 64rpx;
+  font-weight: 600;
+  color: #ff4d94;
+  margin-right: 12rpx;
+}
+
+.countdown-text {
+  font-size: 36rpx;
+  color: #666;
+}
+
+/* 详情列表样式 */
+.detail-list {
+  padding: 0 20rpx;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.detail-label {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.detail-label text {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.detail-value {
+  font-size: 30rpx;
+  color: #666;
+  max-width: 60%;
+  text-align: right;
+}
+
+.highlight-text {
+  color: #333;
+  font-weight: 500;
+}
+
+/* 类型标签样式 */
+.type-tag {
+  display: inline-block;
+  padding: 4rpx 20rpx;
+  border-radius: 24rpx;
+  color: #fff;
+  font-size: 26rpx;
+}
+
+/* 底部按钮样式 */
+.popup-buttons {
+  display: flex;
+  padding: 30rpx;
+  gap: 20rpx;
+}
+
+.btn-delete,
+.btn-edit {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  transition: all 0.3s;
+}
+
+.btn-delete {
+  background: #ff4d4d;
+  color: #fff;
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, #ff6b6b, #ff4d94);
+  color: #fff;
+}
+
+.btn-delete:active,
+.btn-edit:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}

@@ -21,6 +21,8 @@ Page({
     ],
     showDetailPopup: false,
     currentWish: null,
+    activeFilter: 'all',
+    filteredWishList: [],
   },
 
   onLoad() {
@@ -76,7 +78,10 @@ Page({
 
         console.log('处理后的愿望列表:', wishList)
 
-        this.setData({ wishList })
+        this.setData({ 
+          wishList,
+          filteredWishList: wishList
+        })
       } else {
         throw new Error(res.data?.message || '获取愿望列表失败')
       }
@@ -497,5 +502,31 @@ Page({
         current: url
       })
     }
+  },
+
+  // 筛选切换处理
+  onFilterChange(e) {
+    const type = e.currentTarget.dataset.type
+    this.setData({ activeFilter: type })
+    this.filterWishList()
+  },
+
+  // 筛选愿望列表
+  filterWishList() {
+    const { wishList, activeFilter } = this.data
+    let filteredList = []
+    
+    switch (activeFilter) {
+      case 'ongoing':
+        filteredList = wishList.filter(item => item.status === 0)
+        break
+      case 'completed':
+        filteredList = wishList.filter(item => item.status === 1)
+        break
+      default:
+        filteredList = wishList
+    }
+    
+    this.setData({ filteredWishList: filteredList })
   },
 }) 
