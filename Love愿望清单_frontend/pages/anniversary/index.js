@@ -777,5 +777,61 @@ Page({
       }
     }
     return day
+  },
+
+  // 更新愿望状态
+  async updateWishStatus(id, status) {
+    try {
+      const token = wx.getStorageSync('token')
+      if (!token) throw new Error('未登录')
+
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${app.globalData.baseUrl}/api/wish/${id}/status`,
+          method: 'PUT',
+          header: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          data: { status },
+          success: resolve,
+          fail: reject
+        })
+      })
+
+      // 检查HTTP状态码
+      if (res.statusCode !== 200) {
+        throw new Error(res.data?.message || '网络请求失败')
+      }
+
+      // 检查业务状态码
+      if (res.data.code !== 0) {
+        throw new Error(res.data.message || '更新失败')
+      }
+
+      // 更新成功
+      wx.showToast({
+        title: '更新成功',
+        icon: 'success',
+        duration: 2000
+      })
+
+      // 延迟刷新列表
+      setTimeout(() => {
+        if (this.data.isPageActive) {
+          this.getAnniversaryList()
+        }
+      }, 1000)
+
+      return true
+    } catch (err) {
+      console.error('更新愿望状态失败:', err)
+      wx.showToast({
+        title: err.message || '更新失败',
+        icon: 'none',
+        duration: 2000
+      })
+      return false
+    }
   }
 }) 

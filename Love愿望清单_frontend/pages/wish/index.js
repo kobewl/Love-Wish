@@ -284,16 +284,30 @@ Page({
 
     try {
       console.log('更新愿望状态:', { id, status, newStatus: status === 1 ? 0 : 1 })
-      const res = await wx.request({
-        url: `${app.globalData.baseUrl}/api/wish/${id}/status`,
-        method: 'PUT',
-        header: {
-          'Authorization': `Bearer ${wx.getStorageSync('token')}`,
-          'Content-Type': 'application/json'
-        },
-        data: {
-          status: status === 1 ? 0 : 1
+      
+      // 先在本地更新状态，提供即时反馈
+      const wishList = this.data.wishList.map(item => {
+        if (item.id === id) {
+          return { ...item, status: status === 1 ? 0 : 1 }
         }
+        return item
+      })
+      this.setData({ wishList })
+
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${app.globalData.baseUrl}/api/wish/${id}/status`,
+          method: 'PUT',
+          header: {
+            'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+            'Content-Type': 'application/json'
+          },
+          data: {
+            status: status === 1 ? 0 : 1
+          },
+          success: resolve,
+          fail: reject
+        })
       })
 
       console.log('更新响应:', res)
@@ -304,11 +318,16 @@ Page({
           icon: 'success',
           duration: 2000
         })
-        // 重新获取列表
-        setTimeout(() => {
-          this.getWishList()
-        }, 1000)
       } else {
+        // 如果服务器更新失败，回滚本地状态
+        const wishList = this.data.wishList.map(item => {
+          if (item.id === id) {
+            return { ...item, status }
+          }
+          return item
+        })
+        this.setData({ wishList })
+        
         throw new Error(res.data?.message || '更新失败')
       }
     } catch (err) {
@@ -339,46 +358,76 @@ Page({
   },
 
   // 删除愿望
-  deleteWish(e) {
+  async deleteWish(e) {
     const id = e.currentTarget.dataset.id
-    wx.showModal({
-      title: '提示',
-      content: '确定要删除这个愿望吗？',
-      success: async (res) => {
-        if (res.confirm) {
-          wx.showLoading({
-            title: '删除中...',
-            mask: true
-          })
+    if (!id) {
+      wx.showToast({
+        title: '数据异常',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
 
-          try {
-            const res = await wx.request({
-              url: `${app.globalData.baseUrl}/api/wish/${id}`,
-              method: 'DELETE',
-              header: {
-                'Authorization': `Bearer ${wx.getStorageSync('token')}`,
-                'Content-Type': 'application/json'
-              }
-            })
+    try {
+      const modalRes = await new Promise((resolve) => {
+        wx.showModal({
+          title: '提示',
+          content: '确定要删除这个愿望吗？',
+          success: resolve
+        })
+      })
 
-            if (res.statusCode === 200 && res.data.code === 0) {
-              wx.showToast({
-                title: '删除成功',
-                icon: 'success'
-              })
-              this.getWishList()
-            } else {
-              app.showError(res.data?.message || '删除失败')
-            }
-          } catch (err) {
-            console.error('删除愿望失败:', err)
-            app.showError('网络请求失败')
-          } finally {
-            wx.hideLoading()
-          }
-        }
+      if (!modalRes.confirm) return
+
+      wx.showLoading({
+        title: '删除中...',
+        mask: true
+      })
+
+      const res = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${app.globalData.baseUrl}/api/wish/${id}`,
+          method: 'DELETE',
+          header: {
+            'Authorization': `Bearer ${wx.getStorageSync('token')}`,
+            'Content-Type': 'application/json'
+          },
+          success: resolve,
+          fail: reject
+        })
+      })
+
+      console.log('删除响应:', res)
+
+      if (res.statusCode === 200 && res.data && res.data.code === 0) {
+        // 先在本地删除该愿望
+        const wishList = this.data.wishList.filter(item => item.id !== id)
+        this.setData({ wishList })
+
+        wx.showToast({
+          title: '删除成功',
+          icon: 'success',
+          duration: 2000
+        })
+
+        // 延迟重新获取列表
+        setTimeout(() => {
+          this.getWishList()
+        }, 1000)
+      } else {
+        throw new Error(res.data?.message || '删除失败')
       }
-    })
+    } catch (err) {
+      console.error('删除愿望失败:', err)
+      wx.showToast({
+        title: err.message || '网络请求失败',
+        icon: 'none',
+        duration: 2000
+      })
+    } finally {
+      wx.hideLoading()
+    }
   },
 
   // 切换标签

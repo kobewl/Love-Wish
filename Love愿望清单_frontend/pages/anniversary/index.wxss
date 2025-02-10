@@ -88,25 +88,24 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 2rpx solid #f5f5f5;
 }
 
-.header-left {
-  display: flex;
-  flex-direction: column;
-}
-
-.header-left .title {
+.list-header .title {
   font-size: 36rpx;
   font-weight: 600;
   color: #333;
-  margin-bottom: 8rpx;
+  position: relative;
 }
 
-.header-left .subtitle {
-  font-size: 24rpx;
-  color: #999;
+.list-header .title::after {
+  content: "";
+  position: absolute;
+  bottom: -8rpx;
+  left: 0;
+  width: 48rpx;
+  height: 4rpx;
+  background: #ff69b4;
+  border-radius: 2rpx;
 }
 
 .add-btn {
@@ -115,14 +114,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 105, 180, 0.1);
-  border-radius: 50%;
+  background: #fff;
+  border-radius: 40rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255, 105, 180, 0.2);
   transition: all 0.3s;
 }
 
 .add-btn:active {
   transform: scale(0.95);
-  background: rgba(255, 105, 180, 0.2);
 }
 
 /* 列表内容 */
@@ -131,11 +130,14 @@
 }
 
 .anniversary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
   margin-bottom: 24rpx;
   background: #fff;
   border-radius: 16rpx;
-  padding: 24rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
   transition: all 0.3s;
 }
 
@@ -151,12 +153,11 @@
 }
 
 .item-type {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 8rpx 20rpx;
-  border-radius: 24rpx;
+  padding: 6rpx 20rpx;
+  border-radius: 20rpx;
   font-size: 24rpx;
+  color: #fff;
+  margin-right: 20rpx;
 }
 
 .item-info {
@@ -172,9 +173,8 @@
 }
 
 .item-date {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
+  font-size: 26rpx;
+  color: #999;
 }
 
 .item-right {
@@ -216,152 +216,99 @@
   line-height: 1.6;
 }
 
-/* 弹窗页面样式 */
-.popup-page {
-  min-height: 85vh;
+/* 弹窗样式 */
+.popup-content {
+  padding: 30rpx;
+  min-height: 60vh;
   display: flex;
   flex-direction: column;
-  background: #f7f8fa;
 }
 
 .popup-header {
-  position: relative;
-  text-align: center;
-  padding: 32rpx;
   font-size: 32rpx;
-  color: #333;
-  background: #fff;
+  font-weight: 500;
+  text-align: center;
+  padding: 20rpx 0 40rpx;
   border-bottom: 1rpx solid #eee;
 }
 
-.popup-content {
+.form-content {
   flex: 1;
-  padding: 32rpx 0;
-  overflow-y: auto;
+  padding: 20rpx 0;
 }
 
-.form-group {
-  background: #fff;
+/* 修改van-field样式 */
+.van-field__label {
+  color: #333 !important;
+  font-size: 28rpx !important;
 }
 
-.form-item {
+.van-field__input {
+  text-align: right !important;
+  color: #666 !important;
+  font-size: 28rpx !important;
+}
+
+/* 修改van-cell样式 */
+.van-cell {
+  padding: 24rpx 0 !important;
+}
+
+.van-cell__title {
+  color: #333 !important;
+  font-size: 28rpx !important;
+}
+
+.van-cell__value {
+  color: #666 !important;
+  font-size: 28rpx !important;
+}
+
+/* 底部按钮样式 */
+.popup-footer {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 32rpx;
-  background: #fff;
-  border-bottom: 1rpx solid #eee;
-}
-
-.form-item:last-child {
-  border-bottom: none;
-}
-
-.form-label {
-  color: #333;
-  font-size: 28rpx;
-}
-
-.form-input {
-  flex: 1;
-  text-align: right;
-  font-size: 28rpx;
-  color: #333;
-}
-
-.form-input::placeholder {
-  color: #999;
-}
-
-.form-value {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  color: #666;
-  font-size: 28rpx;
-}
-
-.detail-value {
-  color: #666;
-  font-size: 28rpx;
-}
-
-.popup-footer {
-  padding: 32rpx;
-  background: #fff;
+  padding-top: 30rpx;
   border-top: 1rpx solid #eee;
-  display: flex;
-  gap: 24rpx;
 }
 
-.btn-cancel,
-.btn-confirm,
-.btn-delete,
-.btn-edit {
+.cancel-btn,
+.confirm-btn {
   flex: 1;
-  height: 88rpx;
-  line-height: 88rpx;
+  height: 80rpx;
+  line-height: 80rpx;
   text-align: center;
-  font-size: 32rpx;
-  border-radius: 0;
+  font-size: 30rpx;
+  border-radius: 8rpx;
+  margin: 0 20rpx;
 }
 
-.btn-cancel {
-  background: #f5f5f5;
-  color: #333;
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #666;
 }
 
-.btn-confirm {
-  background: #ff69b4;
+.confirm-btn {
+  background-color: #ff69b4;
   color: #fff;
 }
 
-.btn-delete {
-  background: #fff;
-  color: #ff4d4f;
-  border: none;
-}
-
-.btn-edit {
-  background: #ff69b4;
-  color: #fff;
-}
-
-/* 选择器样式优化 */
+/* 选择器样式 */
 .van-picker {
-  background: #fff !important;
+  width: 100%;
 }
 
 .van-picker__toolbar {
-  border-bottom: 1rpx solid #eee !important;
+  padding: 16rpx !important;
 }
 
 .van-picker__cancel,
 .van-picker__confirm {
-  font-size: 32rpx !important;
-  padding: 0 32rpx !important;
+  font-size: 28rpx !important;
 }
 
 .van-picker__confirm {
   color: #ff69b4 !important;
-}
-
-.van-picker__cancel {
-  color: #666 !important;
-}
-
-/* 动画优化 */
-.popup-page {
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
 }
 
 /* 加载状态 */
@@ -381,8 +328,11 @@
 }
 
 .detail-item {
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  border-bottom: 2rpx solid rgba(0, 0, 0, 0.04);
 }
 
 .detail-item:last-child {
@@ -437,12 +387,10 @@
   flex-direction: column;
 }
 
-.add-popup-title,
-.detail-popup-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12rpx;
+.add-popup-title {
+  font-size: 32rpx;
+  color: #333;
+  text-align: center;
   padding: 30rpx 0;
   border-bottom: 1rpx solid #eee;
 }
@@ -453,14 +401,16 @@
 }
 
 .form-item {
-  position: relative;
-  padding: 24rpx 0;
+  display: flex;
+  align-items: center;
+  min-height: 100rpx;
+  border-bottom: 1rpx solid #eee;
 }
 
 .form-label {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
+  width: 160rpx;
+  font-size: 28rpx;
+  color: #333;
 }
 
 .form-input {
@@ -471,57 +421,36 @@
 
 .form-value {
   flex: 1;
-  padding-right: 40rpx;
+  font-size: 28rpx;
+  color: #333;
+  text-align: left;
 }
 
 .add-popup-buttons {
   display: flex;
   padding: 20rpx;
-  gap: 20rpx;
   border-top: 1rpx solid #eee;
 }
 
 .btn-cancel,
-.btn-confirm,
-.btn-delete,
-.btn-edit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8rpx;
+.btn-confirm {
+  flex: 1;
   height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
   font-size: 32rpx;
-  border-radius: 8rpx;
-  transition: all 0.3s;
+  border: none;
+  border-radius: 0;
 }
 
 .btn-cancel {
   background: #f5f5f5;
-  color: #666;
+  color: #333;
 }
 
 .btn-confirm {
-  background: linear-gradient(to right, #ff69b4, #ff8dc7);
-  color: #fff;
-}
-
-.btn-delete {
-  background: #fff;
-  color: #ff4d4f;
-  border: 2rpx solid #ff4d4f;
-}
-
-.btn-edit {
   background: #ff69b4;
   color: #fff;
-}
-
-.btn-cancel:active,
-.btn-confirm:active,
-.btn-delete:active,
-.btn-edit:active {
-  transform: scale(0.98);
-  opacity: 0.9;
 }
 
 /* 修改placeholder样式 */
