@@ -18,7 +18,9 @@ Page({
       { title: '个人', type: 'PRIVATE' },
       { title: '共同', type: 'SHARED' },
       { title: '惊喜', type: 'SURPRISE' }
-    ]
+    ],
+    showDetailPopup: false,
+    currentWish: null,
   },
 
   onLoad() {
@@ -56,19 +58,23 @@ Page({
         })
       })
 
+      console.log('获取到的愿望列表原始数据:', res.data)
+
       if (res.statusCode === 200 && res.data && res.data.code === 0) {
         const records = res.data.data.records || []
         const wishList = records.map(item => ({
           id: item.id,
-          userId: item.user_id,
+          userId: item.userId,
           title: item.title,
           description: item.description || '',
-          imageUrl: item.image_url || '',
+          imageUrl: item.imageUrl && item.imageUrl !== 'null' ? item.imageUrl : '',
           status: item.status || 0,
-          createTime: item.create_time ? item.create_time.substring(0, 16).replace('T', ' ') : '',
-          updateTime: item.update_time ? item.update_time.substring(0, 16).replace('T', ' ') : '',
-          completeTime: item.complete_time ? item.complete_time.substring(0, 16).replace('T', ' ') : ''
+          createTime: item.createTime ? item.createTime.substring(0, 19).replace('T', ' ') : '',
+          updateTime: item.updateTime ? item.updateTime.substring(0, 19).replace('T', ' ') : '',
+          completeTime: item.status === 1 && item.completeTime ? item.completeTime.substring(0, 19).replace('T', ' ') : ''
         }))
+
+        console.log('处理后的愿望列表:', wishList)
 
         this.setData({ wishList })
       } else {
@@ -461,5 +467,35 @@ Page({
       activeTab: index 
     })
     this.getWishList()
-  }
+  },
+
+  // 显示愿望详情
+  showWishDetail(e) {
+    const wish = e.currentTarget.dataset.item
+    if (!wish) return
+    
+    this.setData({
+      showDetailPopup: true,
+      currentWish: wish
+    })
+  },
+
+  // 关闭详情弹窗
+  onCloseDetailPopup() {
+    this.setData({
+      showDetailPopup: false,
+      currentWish: null
+    })
+  },
+
+  // 预览图片
+  previewImage(e) {
+    const url = e.currentTarget.dataset.url || (this.data.currentWish && this.data.currentWish.imageUrl)
+    if (url) {
+      wx.previewImage({
+        urls: [url],
+        current: url
+      })
+    }
+  },
 }) 

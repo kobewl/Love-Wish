@@ -33,7 +33,7 @@
         class="wish-card {{ item.status === 1 ? 'completed' : '' }}" 
         wx:for="{{ wishList }}" 
         wx:key="id"
-        bindtap="showDetailPopup"
+        bindtap="showWishDetail"
         data-item="{{ item }}"
       >
         <view class="wish-content">
@@ -52,7 +52,13 @@
             <text>{{ item.description }}</text>
           </view>
           <view class="wish-image" wx:if="{{ item.imageUrl }}">
-            <image src="{{ item.imageUrl }}" mode="aspectFill"></image>
+            <image 
+              src="{{ item.imageUrl }}" 
+              mode="aspectFill" 
+              lazy-load 
+              bindtap="previewImage"
+              data-url="{{ item.imageUrl }}"
+            />
           </view>
           <view class="wish-footer">
             <view class="wish-time">
@@ -180,6 +186,128 @@
         <button class="footer-btn confirm-btn" bindtap="onConfirmAdd">
           <van-icon name="success" />
           <text>确定</text>
+        </button>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 愿望详情弹窗 -->
+  <van-popup
+    show="{{ showDetailPopup }}"
+    position="bottom"
+    round="{{ true }}"
+    custom-style="min-height: 65vh;"
+    bind:close="onCloseDetailPopup"
+  >
+    <view class="detail-popup">
+      <!-- 顶部标题栏 -->
+      <view class="detail-header">
+        <view class="header-content">
+          <view class="header-icon">
+            <van-icon name="star" color="#FF69B4" size="48rpx"/>
+          </view>
+          <view class="header-text">
+            <text class="header-title">愿望详情</text>
+            <text class="header-subtitle">查看愿望的完整信息</text>
+          </view>
+        </view>
+        <view class="close-btn" bindtap="onCloseDetailPopup">
+          <van-icon name="cross" size="44rpx" color="#999"/>
+        </view>
+      </view>
+      
+      <!-- 详情内容区 -->
+      <scroll-view scroll-y class="detail-content">
+        <!-- 标题部分 -->
+        <view class="detail-section">
+          <view class="detail-item">
+            <view class="item-label">
+              <van-icon name="label-o" color="#FF69B4" size="40rpx"/>
+              <text>标题</text>
+            </view>
+            <view class="item-value title-value">{{ currentWish.title }}</view>
+          </view>
+        </view>
+
+        <!-- 描述部分 -->
+        <view class="detail-section" wx:if="{{ currentWish.description }}">
+          <view class="detail-item">
+            <view class="item-label">
+              <van-icon name="description" color="#FF69B4" size="40rpx"/>
+              <text>描述</text>
+            </view>
+            <view class="item-value description-value">{{ currentWish.description }}</view>
+          </view>
+        </view>
+
+        <!-- 图片部分 -->
+        <view class="detail-section" wx:if="{{ currentWish.imageUrl && currentWish.imageUrl !== 'null' }}">
+          <view class="detail-item">
+            <view class="item-label">
+              <van-icon name="photo-o" color="#FF69B4" size="40rpx"/>
+              <text>图片</text>
+            </view>
+            <view class="item-value image-value">
+              <image 
+                class="detail-image" 
+                src="{{ currentWish.imageUrl }}" 
+                mode="aspectFill" 
+                bindtap="previewImage"
+                lazy-load
+              />
+            </view>
+          </view>
+        </view>
+
+        <!-- 状态部分 -->
+        <view class="detail-section">
+          <view class="detail-item">
+            <view class="item-label">
+              <van-icon name="checked" color="#FF69B4" size="40rpx"/>
+              <text>状态</text>
+            </view>
+            <view class="item-value status-value {{ currentWish.status === 1 ? 'completed' : '' }}">
+              <van-icon name="{{ currentWish.status === 1 ? 'success' : 'clock' }}" size="32rpx"/>
+              <text>{{ currentWish.status === 1 ? '已完成' : '进行中' }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 时间信息 -->
+        <view class="detail-section">
+          <view class="detail-item">
+            <view class="item-label">
+              <van-icon name="clock-o" color="#FF69B4" size="40rpx"/>
+              <text>创建时间</text>
+            </view>
+            <view class="item-value time-value">{{ currentWish.createTime }}</view>
+          </view>
+          <view class="detail-item" wx:if="{{ currentWish.status === 1 && currentWish.completeTime }}">
+            <view class="item-label">
+              <van-icon name="success" color="#FF69B4" size="40rpx"/>
+              <text>完成时间</text>
+            </view>
+            <view class="item-value time-value">{{ currentWish.completeTime }}</view>
+          </view>
+          <view class="detail-item">
+            <view class="item-label">
+              <van-icon name="edit" color="#FF69B4" size="40rpx"/>
+              <text>更新时间</text>
+            </view>
+            <view class="item-value time-value">{{ currentWish.updateTime }}</view>
+          </view>
+        </view>
+      </scroll-view>
+
+      <!-- 底部按钮区 -->
+      <view class="detail-footer">
+        <button class="footer-btn edit-btn" bindtap="editWish" data-item="{{ currentWish }}">
+          <van-icon name="edit" size="36rpx"/>
+          <text>编辑愿望</text>
+        </button>
+        <button class="footer-btn delete-btn" bindtap="deleteWish" data-id="{{ currentWish.id }}">
+          <van-icon name="delete" size="36rpx"/>
+          <text>删除愿望</text>
         </button>
       </view>
     </view>
