@@ -1,1 +1,274 @@
 /* pages/my/index.wxss */
+
+/* 页面容器 */
+.my-container {
+  min-height: 100vh;
+  background: #f8f8f8;
+  padding-bottom: 40rpx;
+}
+
+/* 顶部背景 */
+.bg-top {
+  height: 360rpx;
+  background: linear-gradient(to bottom, #ff69b4, #ffb6c1);
+  position: relative;
+}
+
+/* 用户信息卡片 */
+.user-card {
+  margin: -180rpx 30rpx 0;
+  padding: 40rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 32rpx rgba(255, 105, 180, 0.15);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}
+
+.avatar-section {
+  position: relative;
+  margin-right: 30rpx;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  border: 4rpx solid #fff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.edit-icon {
+  position: absolute;
+  right: -8rpx;
+  bottom: -8rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background: #ff69b4;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(255, 105, 180, 0.3);
+}
+
+.user-info {
+  flex: 1;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.user-id {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 12rpx;
+}
+
+.edit-text {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.edit-text text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 功能列表 */
+.feature-list,
+.settings-list {
+  margin: 30rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.feature-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.feature-item:last-child {
+  border-bottom: none;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.item-left text {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.item-hover {
+  background: #f8f8f8;
+}
+
+/* 退出登录按钮 */
+.logout-btn {
+  margin: 60rpx 30rpx;
+  height: 88rpx;
+  background: #fff;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+}
+
+.logout-btn text {
+  font-size: 32rpx;
+  color: #ff4d4d;
+}
+
+/* 编辑弹窗 */
+.edit-popup {
+  padding: 30rpx;
+  background: #fff;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.popup-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 单元格样式 */
+.cell-value {
+  color: #333 !important;
+}
+
+/* 按钮样式 */
+.popup-buttons {
+  display: flex;
+  gap: 20rpx;
+  padding: 40rpx 30rpx;
+}
+
+.btn-cancel,
+.btn-confirm {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  border: none;
+}
+
+.btn-cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #ff69b4, #ff4d94);
+  color: #fff;
+}
+
+.btn-cancel:active {
+  opacity: 0.8;
+}
+
+.btn-confirm:active {
+  opacity: 0.8;
+}
+
+/* 选择器样式 */
+.van-picker__toolbar {
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.van-picker__title {
+  color: #333;
+  font-weight: 500;
+}
+
+.van-picker__confirm {
+  color: #ff69b4 !important;
+}
+
+/* 输入框样式 */
+.van-field__input {
+  text-align: right !important;
+  color: #333 !important;
+}
+
+.van-cell {
+  padding: 28rpx 30rpx !important;
+}
+
+/* 主题设置 */
+.theme-popup {
+  padding: 30rpx;
+}
+
+.theme-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+  margin-top: 30rpx;
+}
+
+.theme-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  background: #f8f8f8;
+  position: relative;
+}
+
+.theme-color {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  border: 4rpx solid #fff;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.theme-item text {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.theme-active {
+  background: rgba(255, 105, 180, 0.1);
+}
+
+.theme-active text {
+  color: #ff4d94;
+  font-weight: 500;
+}
+
+/* 开关样式 */
+.van-switch {
+  zoom: 0.8;
+}

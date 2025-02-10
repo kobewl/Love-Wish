@@ -1,2 +1,196 @@
 <!--pages/my/index.wxml-->
-<text>pages/my/index.wxml</text>
+<view class="my-container">
+  <!-- 顶部背景 -->
+  <view class="bg-top"></view>
+
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="avatar-section" bindtap="onTapAvatar">
+      <image class="avatar" src="{{ userInfo.avatarUrl || '/static/images/default-avatar.png' }}" mode="aspectFill"></image>
+      <view class="edit-icon">
+        <van-icon name="photograph" color="#fff" size="36rpx" />
+      </view>
+    </view>
+    <view class="user-info" bindtap="onTapEdit">
+      <view class="nickname">{{ userInfo.nickname || '微信用户' }}</view>
+      <view class="user-id">配对码: {{ userInfo.pairCode || 'UYNMDC' }}</view>
+      <view class="edit-text" catchtap="onTapEdit">
+        <van-icon name="edit" color="#999" size="28rpx" />
+        <text>编辑资料</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="feature-list">
+    <navigator url="/pages/anniversary/index" class="feature-item" hover-class="item-hover">
+      <view class="item-left">
+        <van-icon name="calendar-o" color="#ff4d94" size="48rpx" />
+        <text>我的纪念日</text>
+      </view>
+      <van-icon name="arrow" color="#999" />
+    </navigator>
+
+    <navigator url="/pages/wish/index" class="feature-item" hover-class="item-hover">
+      <view class="item-left">
+        <van-icon name="star-o" color="#ff4d94" size="48rpx" />
+        <text>我的愿望单</text>
+      </view>
+      <van-icon name="arrow" color="#999" />
+    </navigator>
+
+    <view class="feature-item" bindtap="onTapPairSpace" hover-class="item-hover">
+      <view class="item-left">
+        <van-icon name="friends-o" color="#ff4d94" size="48rpx" />
+        <text>情侣空间</text>
+      </view>
+      <van-icon name="arrow" color="#999" />
+    </view>
+  </view>
+
+  <!-- 设置列表 -->
+  <view class="settings-list">
+    <view class="feature-item" bindtap="onTapNotification" hover-class="item-hover">
+      <view class="item-left">
+        <van-icon name="bell" color="#ff4d94" size="48rpx" />
+        <text>消息提醒</text>
+      </view>
+      <van-switch checked="{{ notificationEnabled }}" bind:change="onNotificationChange" size="44rpx" />
+    </view>
+
+    <view class="feature-item" bindtap="onTapTheme" hover-class="item-hover">
+      <view class="item-left">
+        <van-icon name="setting-o" color="#ff4d94" size="48rpx" />
+        <text>主题设置</text>
+      </view>
+      <van-icon name="arrow" color="#999" />
+    </view>
+
+    <navigator url="/pages/about/index" class="feature-item" hover-class="item-hover">
+      <view class="item-left">
+        <van-icon name="info-o" color="#ff4d94" size="48rpx" />
+        <text>关于我们</text>
+      </view>
+      <van-icon name="arrow" color="#999" />
+    </navigator>
+  </view>
+
+  <!-- 退出登录按钮 -->
+  <view class="logout-btn" bindtap="onTapLogout">
+    <text>退出登录</text>
+  </view>
+
+  <!-- 编辑个人信息弹窗 -->
+  <van-popup
+    show="{{ showEditPopup }}"
+    position="bottom"
+    round
+    custom-style="min-height: 40%"
+    bind:close="onCloseEditPopup"
+    safe-area-inset-bottom
+  >
+    <view class="edit-popup">
+      <view class="popup-header">
+        <text class="popup-title">编辑个人信息</text>
+        <van-icon name="cross" size="44rpx" color="#999" bindtap="onCloseEditPopup" />
+      </view>
+
+      <van-cell-group>
+        <van-field
+          value="{{ editInfo.nickname }}"
+          label="昵称"
+          placeholder="请输入昵称"
+          maxlength="20"
+          bind:change="onNicknameInput"
+          input-align="right"
+        />
+
+        <van-cell
+          title="性别"
+          is-link
+          value="{{ genderOptions[editInfo.gender] }}"
+          bind:click="onShowGenderPicker"
+          value-class="cell-value"
+        />
+
+        <van-cell
+          title="生日"
+          is-link
+          value="{{ editInfo.birthday || '请选择生日' }}"
+          bind:click="onShowDatePicker"
+          value-class="cell-value"
+        />
+      </van-cell-group>
+
+      <view class="popup-buttons">
+        <button class="btn-cancel" bindtap="onCloseEditPopup">取消</button>
+        <button class="btn-confirm" bindtap="onConfirmEdit">保存</button>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 性别选择器 -->
+  <van-popup
+    show="{{ showGenderPicker }}"
+    position="bottom"
+    bind:close="onCloseGenderPicker"
+    safe-area-inset-bottom
+  >
+    <van-picker
+      show-toolbar
+      title="选择性别"
+      columns="{{ genderOptions }}"
+      default-index="{{ editInfo.gender }}"
+      bind:confirm="onConfirmGenderPicker"
+      bind:cancel="onCloseGenderPicker"
+    />
+  </van-popup>
+
+  <!-- 日期选择器 -->
+  <van-popup
+    show="{{ showDatePicker }}"
+    position="bottom"
+    bind:close="onCloseDatePicker"
+    safe-area-inset-bottom
+  >
+    <van-datetime-picker
+      type="date"
+      title="选择生日"
+      value="{{ currentDate }}"
+      min-date="{{ minDate }}"
+      max-date="{{ maxDate }}"
+      bind:confirm="onConfirmDatePicker"
+      bind:cancel="onCloseDatePicker"
+    />
+  </van-popup>
+
+  <!-- 主题设置弹窗 -->
+  <van-popup
+    show="{{ showThemePopup }}"
+    position="bottom"
+    round
+    custom-style="min-height: 30%"
+    bind:close="onCloseThemePopup"
+  >
+    <view class="theme-popup">
+      <view class="popup-header">
+        <text class="popup-title">主题设置</text>
+        <van-icon name="cross" size="44rpx" color="#999" bindtap="onCloseThemePopup" />
+      </view>
+
+      <view class="theme-list">
+        <view 
+          class="theme-item {{ currentTheme === theme.value ? 'theme-active' : '' }}"
+          wx:for="{{ themeOptions }}"
+          wx:key="value"
+          data-theme="{{ item.value }}"
+          bindtap="onThemeSelect"
+        >
+          <view class="theme-color" style="background: {{ item.color }}"></view>
+          <text>{{ item.name }}</text>
+          <van-icon wx:if="{{ currentTheme === item.value }}" name="success" color="#ff4d94" size="40rpx" />
+        </view>
+      </view>
+    </view>
+  </van-popup>
+</view>
